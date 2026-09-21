@@ -1327,8 +1327,9 @@
         align-items: center;
         justify-content: space-between;
         gap: 12px;
-        padding: 12px 14px;
-        padding-top: max(12px, env(safe-area-inset-top));
+        min-height: 56px;
+        padding: 10px 14px;
+        padding-top: max(10px, env(safe-area-inset-top));
         background: var(--shell);
         color: #e8ebe4;
         border-bottom: 1px solid #2c382c;
@@ -1340,6 +1341,7 @@
         text-transform: uppercase;
         line-height: 1.1;
         min-width: 0;
+        flex: 1;
       }
       .mobile-bar .mobile-brand span {
         display: block;
@@ -1353,14 +1355,16 @@
       }
       .mobile-bar #railToggle {
         flex-shrink: 0;
+        align-self: center;
         background: #243024;
         border: 1px solid #3a4638;
         color: #f0e6d4;
         font: inherit;
-        font-size: 0.82rem;
+        font-size: 0.78rem;
         font-weight: 700;
-        padding: 10px 14px;
-        min-height: 44px;
+        padding: 8px 12px;
+        min-height: 40px;
+        line-height: 1;
         cursor: pointer;
         letter-spacing: 0.04em;
         text-transform: uppercase;
@@ -1460,7 +1464,7 @@
         position: sticky;
         top: 56px;
         z-index: 40;
-        background: linear-gradient(180deg, var(--paper) 70%, transparent);
+        background: linear-gradient(180deg, var(--paper) 85%, transparent);
         margin-left: -12px;
         margin-right: -12px;
         padding-left: 12px;
@@ -1786,11 +1790,14 @@
     @media (max-width: 640px) {
       .mobile-bar { top: 0; }
       .topbar {
-        top: 52px;
-        position: relative;
+        position: static;
+        top: auto;
         background: transparent;
         margin-bottom: 8px;
         padding-bottom: 8px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
       }
       .topbar p { display: none; }
       .toolbar { position: relative; top: auto; }
@@ -1993,10 +2000,32 @@
       <div class="rail-block">
         <h3>Deal inputs</h3>
         <label>
+          Market (on-road city)
+          <select id="market">
+            <option value="jaipur" selected>Jaipur</option>
+            <option value="delhi">Delhi</option>
+            <option value="gurugram">Gurugram</option>
+            <option value="noida">Noida</option>
+            <option value="mumbai">Mumbai</option>
+            <option value="pune">Pune</option>
+            <option value="bengaluru">Bengaluru</option>
+            <option value="hyderabad">Hyderabad</option>
+            <option value="chennai">Chennai</option>
+            <option value="ahmedabad">Ahmedabad</option>
+            <option value="surat">Surat</option>
+            <option value="kolkata">Kolkata</option>
+            <option value="chandigarh">Chandigarh</option>
+            <option value="lucknow">Lucknow</option>
+            <option value="indore">Indore</option>
+            <option value="kochi">Kochi</option>
+          </select>
+        </label>
+        <p class="field-hint" id="marketHint">Prices scaled vs Jaipur on-road baseline</p>
+        <label>
           EV Max sale (₹)
           <input type="number" id="sale" min="500000" max="1500000" step="10000" value="900000" />
         </label>
-        <p class="field-hint">Typical Jaipur range ₹8–10.5L</p>
+        <p class="field-hint" id="saleHint">Typical Jaipur range ₹8–10.5L</p>
         <label>
           Old loan pending (₹)
           <input type="number" id="pending" min="0" max="1500000" step="1000" value="306000" />
@@ -2325,7 +2354,7 @@
                 <label><input type="checkbox" data-k="v2" /> Foreclosure / NOC letter from bank</label>
                 <label><input type="checkbox" data-k="v3" /> <span id="checkTdLabel">Lead pick test drive</span></label>
                 <label><input type="checkbox" data-k="v4" /> Backup / hybrid test drive</label>
-                <label><input type="checkbox" data-k="v5" /> Sealed Jaipur on-road quote</label>
+                <label><input type="checkbox" data-k="v5" /> <span id="checkQuoteLabel">Sealed on-road quote</span></label>
                 <label><input type="checkbox" data-k="v6" /> Loan sanction letter @ agreed rate</label>
                 <label><input type="checkbox" data-k="v7" /> Confirm ventilated seats + rear blinds on VIN</label>
               </div>
@@ -2593,6 +2622,47 @@
         `Trade-out: 2022 Nexon EV Max<br />Loan pending ${inr(pending)} · Cash ${inr(cash)}<br />Target EMI ≈ ${inr(target)}<br /><br />${brandCount} brands · ${CARS.length} models`;
     }
 
+    const MARKETS = {
+      jaipur:     { id: "jaipur", name: "Jaipur", factor: 1.00, hint: "Baseline — catalog prices are Jaipur on-road" },
+      delhi:      { id: "delhi", name: "Delhi", factor: 1.02, hint: "~+2% vs Jaipur (RTO / insurance mix)" },
+      gurugram:   { id: "gurugram", name: "Gurugram", factor: 1.03, hint: "~+3% vs Jaipur (Haryana RTO)" },
+      noida:      { id: "noida", name: "Noida", factor: 1.03, hint: "~+3% vs Jaipur (UP RTO)" },
+      mumbai:     { id: "mumbai", name: "Mumbai", factor: 1.08, hint: "~+8% vs Jaipur (MH RTO often higher)" },
+      pune:       { id: "pune", name: "Pune", factor: 1.06, hint: "~+6% vs Jaipur (MH RTO)" },
+      bengaluru:  { id: "bengaluru", name: "Bengaluru", factor: 1.05, hint: "~+5% vs Jaipur (KA RTO)" },
+      hyderabad:  { id: "hyderabad", name: "Hyderabad", factor: 1.03, hint: "~+3% vs Jaipur (TS RTO)" },
+      chennai:    { id: "chennai", name: "Chennai", factor: 1.04, hint: "~+4% vs Jaipur (TN RTO)" },
+      ahmedabad:  { id: "ahmedabad", name: "Ahmedabad", factor: 0.97, hint: "~−3% vs Jaipur (GJ often lower)" },
+      surat:      { id: "surat", name: "Surat", factor: 0.98, hint: "~−2% vs Jaipur (GJ RTO)" },
+      kolkata:    { id: "kolkata", name: "Kolkata", factor: 1.04, hint: "~+4% vs Jaipur (WB RTO)" },
+      chandigarh: { id: "chandigarh", name: "Chandigarh", factor: 1.02, hint: "~+2% vs Jaipur" },
+      lucknow:    { id: "lucknow", name: "Lucknow", factor: 1.01, hint: "~+1% vs Jaipur (UP RTO)" },
+      indore:     { id: "indore", name: "Indore", factor: 1.00, hint: "Similar to Jaipur on-road band" },
+      kochi:      { id: "kochi", name: "Kochi", factor: 1.05, hint: "~+5% vs Jaipur (KL RTO)" },
+    };
+
+    function getMarket() {
+      const id = document.getElementById("market")?.value || "jaipur";
+      return MARKETS[id] || MARKETS.jaipur;
+    }
+
+    function marketOnRoad(basePrice) {
+      const m = getMarket();
+      const n = Number(basePrice) || 0;
+      return Math.round(n * m.factor);
+    }
+
+    function syncMarketUI() {
+      const m = getMarket();
+      const hint = document.getElementById("marketHint");
+      if (hint) hint.textContent = m.hint;
+      const saleHint = document.getElementById("saleHint");
+      if (saleHint) saleHint.textContent = `Used-car sale in ${m.name} — edit to match local quotes`;
+      const quote = document.getElementById("checkQuoteLabel");
+      if (quote) quote.textContent = `Sealed ${m.name} on-road quote`;
+      document.title = `SUV Garage — ${m.name} Dashboard`;
+    }
+
     const TITLES = {
       overview: ["Overview", "Command center — money, filters, and the lowest-EMI pick."],
       garage: ["Garage", "Browse and pin cars. Search, sort, and filter live."],
@@ -2659,15 +2729,17 @@
       const label = buyMonthLabel(true);
       const short = buyMonthShort();
       const planTitle = MONTH_NAMES[parseBuyMonth().getMonth()] + " plan";
+      const market = getMarket();
+      syncMarketUI();
 
-      TITLES.overview[1] = `Your buying cockpit for a ${label} delivery in Jaipur.`;
+      TITLES.overview[1] = `Your buying cockpit for a ${label} delivery in ${market.name}.`;
       TITLES.plan[0] = planTitle;
       TITLES.plan[1] = `Target ~15 ${short} · valuation → test drive → quote → delivery.`;
 
       const railSub = document.getElementById("railBrandSub");
-      if (railSub) railSub.textContent = `Jaipur · ${short} move`;
+      if (railSub) railSub.textContent = `${market.name} · ${short} move`;
       const mobileSub = document.getElementById("mobileBrandSub");
-      if (mobileSub) mobileSub.textContent = `Jaipur · ${short} move`;
+      if (mobileSub) mobileSub.textContent = `${market.name} · ${short} move`;
 
       const navPlan = document.getElementById("navPlan");
       if (navPlan) navPlan.textContent = planTitle;
@@ -2723,7 +2795,7 @@
           title: "Valuations & foreclosure",
           start: p1Start,
           end: p1End,
-          body: `Bank foreclosure letter for exact EV Max payoff (pending ~ ${inr(pending)}). Get 3 sale quotes (Tata exchange, CARS24, Spinny Jaipur) aiming near ${inr(sale)}.`,
+          body: `Bank foreclosure letter for exact EV Max payoff (pending ~ ${inr(pending)}). Get 3 sale quotes (Tata exchange, CARS24, Spinny ${getMarket().name}) aiming near ${inr(sale)}.`,
         },
         {
           title: "Test drives",
@@ -2735,7 +2807,7 @@
           title: "Lock quote & loan",
           start: p3Start,
           end: p3End,
-          body: `Sealed Jaipur on-road quote. Loan ≈ on-road − ${inr(down)} down (equity ${inr(equity)} + cash ${inr(cash)}). Push rate toward ${rate}% and keep EMI ≤ ${inr(target)}.`,
+          body: `Sealed ${getMarket().name} on-road quote. Loan ≈ on-road − ${inr(down)} down (equity ${inr(equity)} + cash ${inr(cash)}). Push rate toward ${rate}% and keep EMI ≤ ${inr(target)}.`,
         },
         {
           title: "Delivery week",
@@ -2963,11 +3035,15 @@
       const down = equity + cash;
 
       let list = CARS.map((c) => {
-        const loan = Math.max(0, c.price - down);
+        const basePrice = c.price;
+        const price = marketOnRoad(basePrice);
+        const loan = Math.max(0, price - down);
         const monthly = emi(loan, rate, tenure);
         const runCost = runCostMonthly(c, usage);
         return {
           ...c,
+          basePrice,
+          price,
           loan,
           monthly,
           runCost,
@@ -2975,6 +3051,8 @@
           delta: monthly - target,
           pick: false,
           bucket: fuelBucket(c.fuel),
+          isLuxury: LUXURY_BRANDS.has(c.brand) || price >= 4000000,
+          isMidsize: !MICRO_IDS.has(c.id) && price >= 1700000,
         };
       });
 
@@ -3090,9 +3168,10 @@
       const topScore = [...list].sort((a, b) => b.score - a.score).slice(0, 3);
       const watched = watchIds.map((id) => list.find((c) => c.id === id) || CARS.find((c) => c.id === id)).filter(Boolean);
       const lines = [
-        "Jaipur SUV buying brief",
+        `${getMarket().name} SUV buying brief`,
         "—".repeat(28),
         `Planning to buy: ${buyMonthLabel(true)} (~15 ${buyMonthShort()})`,
+        `Market: ${getMarket().name} (on-road ×${getMarket().factor.toFixed(2)} vs Jaipur)`,
         `EV Max sale ~ ${inr(sale)} · pending loan ${inr(pending)} · cash ${inr(cash)}`,
         `Down payment ${inr(down)} · rate ${rate}% · tenure ${tenure} mo · EMI target ${inr(target)}`,
         `Fuel prices: petrol ₹${usage.petrolPrice}/L · diesel ₹${usage.dieselPrice}/L · power ₹${usage.elecPrice}/kWh`,
@@ -3175,7 +3254,7 @@
       renderPlanPanel(ctx);
 
       document.getElementById("statusBar").innerHTML = `
-        <div><small>Market</small><strong>Jaipur</strong><em>On-road mid–high trim</em></div>
+        <div><small>Market</small><strong>${getMarket().name}</strong><em>On-road ×${getMarket().factor.toFixed(2)} vs Jaipur</em></div>
         <div><small>Delivery window</small><strong>${daysToBuy()} days</strong><em>Target ~15 ${buyMonthShort()}</em></div>
         <div><small>Shortlist</small><strong>${list.length} / ${CARS.length}</strong><em>${brandsIn} brands in view</em></div>
         <div><small>Under target</small><strong>${under}</strong><em>EMI ≤ ${inr(target)}</em></div>
@@ -3259,7 +3338,7 @@
            <p><strong>${pick.name}</strong> — ${pick.variant}. ${pick.note}</p>
            <p class="muted" style="margin:10px 0 0">${pickReason(pick, ctx)}</p>
            <div class="rec-meta">
-             <div><small>On-road Jaipur</small><strong>${inr(pick.price)}</strong></div>
+             <div><small>On-road ${getMarket().name}</small><strong>${inr(pick.price)}</strong></div>
              <div><small>EMI @ ${rate}%</small><strong>${inr(pick.monthly)}</strong></div>
              <div><small>vs target</small><strong>${pick.delta <= 0 ? "Saves " + inr(Math.abs(pick.delta)) : "+" + inr(pick.delta)}</strong></div>
            </div>
@@ -3372,7 +3451,7 @@
                 <span class="tag ${r.ncapStars != null && r.ncapStars >= 5 ? "" : "off"}">${ncapLabel(r)}</span>
               </div>
               <div class="meta">
-                <div><small>On-road</small><strong>${inr(r.price)}</strong></div>
+                <div><small>On-road ${getMarket().name}</small><strong>${inr(r.price)}</strong></div>
                 <div><small>Loan</small><strong>${inr(r.loan)}</strong></div>
                 <div><small>EMI @ ${rate}%</small><strong>${inr(r.monthly)}</strong></div>
                 <div><small>vs target</small><strong class="delta ${cls}">${deltaLabel}</strong></div>
@@ -3411,14 +3490,15 @@
         if (fromList) return { ...fromList };
         const base = byId[id];
         if (!base) return null;
-        const loan = Math.max(0, base.price - down);
+        const price = marketOnRoad(base.price);
+        const loan = Math.max(0, price - down);
         const monthly = emi(loan, rate, tenure);
         const runCost = runCostMonthly(base, usage);
-        return { ...base, loan, monthly, runCost, totalMonthly: monthly + (runCost || 0), delta: monthly - target, bucket: fuelBucket(base.fuel), score: null };
+        return { ...base, price, basePrice: base.price, loan, monthly, runCost, totalMonthly: monthly + (runCost || 0), delta: monthly - target, bucket: fuelBucket(base.fuel), score: null };
       }).filter(Boolean);
 
       const cmpFields = [
-        { key: "price", label: "On-road", val: (c) => inr(c.price), raw: (c) => Math.round(c.price), kind: "spec" },
+        { key: "price", label: "On-road " + getMarket().name, val: (c) => inr(c.price), raw: (c) => Math.round(c.price), kind: "spec" },
         { key: "emi", label: "EMI @ " + rate + "%", val: (c) => inr(c.monthly), raw: (c) => Math.round(c.monthly), kind: "spec" },
         { key: "delta", label: "vs target", val: (c) => (c.delta <= 0 ? "−" + inr(Math.abs(c.delta)) : "+" + inr(c.delta)), raw: (c) => Math.round(c.delta), kind: "spec" },
         { key: "loan", label: "Loan", val: (c) => inr(c.loan), raw: (c) => Math.round(c.loan), kind: "spec" },
@@ -3527,10 +3607,11 @@
       const watchCars = watchIds.map((id) => list.find((c) => c.id === id) || (() => {
         const base = byId[id];
         if (!base) return null;
-        const loan = Math.max(0, base.price - down);
+        const price = marketOnRoad(base.price);
+        const loan = Math.max(0, price - down);
         const monthly = emi(loan, rate, tenure);
         const runCost = runCostMonthly(base, usage);
-        return { ...base, loan, monthly, runCost, totalMonthly: monthly + (runCost || 0) };
+        return { ...base, price, basePrice: base.price, loan, monthly, runCost, totalMonthly: monthly + (runCost || 0) };
       })()).filter(Boolean);
       document.getElementById("watchList").innerHTML = watchCars.length
         ? watchCars.map((c) => `
@@ -3793,6 +3874,7 @@
         fuel: document.getElementById("fuelFilter").value,
         search: document.getElementById("garageSearch").value,
         buyMonth: document.getElementById("buyMonth").value,
+        market: document.getElementById("market").value,
       };
       NUMBER_IDS.forEach((id) => {
         prefs.numbers[id] = document.getElementById(id).value;
@@ -3860,6 +3942,9 @@
       if (typeof prefs.buyMonth === "string" && /^\d{4}-\d{2}$/.test(prefs.buyMonth)) {
         document.getElementById("buyMonth").value = prefs.buyMonth;
       }
+      if (typeof prefs.market === "string" && MARKETS[prefs.market]) {
+        document.getElementById("market").value = prefs.market;
+      }
       if (prefs.sortMode && ["emi", "run", "score", "price", "delta", "ncap", "review", "brand"].includes(prefs.sortMode)) {
         sortMode = prefs.sortMode;
         document.querySelectorAll("#sortBtns button").forEach((b) => {
@@ -3906,6 +3991,7 @@
     document.getElementById("garageSearch").addEventListener("input", persistAndRender);
     document.getElementById("buyMonth").addEventListener("change", persistAndRender);
     document.getElementById("buyMonth").addEventListener("input", persistAndRender);
+    document.getElementById("market").addEventListener("change", persistAndRender);
 
     document.getElementById("clearWatch").addEventListener("click", () => {
       watchIds = [];
