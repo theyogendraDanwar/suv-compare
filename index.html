@@ -1313,10 +1313,6 @@
           <summary>Usage (running cost) <em class="acc-count" data-acc-count="usage">0</em></summary>
           <div class="acc-body">
             <label>
-              Km / month
-              <input type="number" id="kmMonth" min="200" max="5000" step="50" value="1200" />
-            </label>
-            <label>
               Petrol ₹/L
               <input type="number" id="petrolPrice" min="50" max="200" step="1" value="102" />
             </label>
@@ -2203,7 +2199,7 @@
       const reviewMinRaw = +document.getElementById("reviewMin").value;
       const reviewMin = Number.isFinite(reviewMinRaw) ? Math.max(0, Math.min(5, reviewMinRaw)) : 0;
       const tenure = getTenure();
-      const kmMonthRaw = +document.getElementById("kmMonth").value;
+      const kmMonthRaw = 1200;
       const cityShareRaw = 70;
       const petrolRaw = +document.getElementById("petrolPrice").value;
       const dieselRaw = +document.getElementById("dieselPrice").value;
@@ -2351,7 +2347,7 @@
         `Planning to buy: ${buyMonthLabel(true)} (~15 ${buyMonthShort()})`,
         `EV Max sale ~ ${inr(sale)} · pending loan ${inr(pending)} · cash ${inr(cash)}`,
         `Down payment ${inr(down)} · rate ${rate}% · tenure ${tenure} mo · EMI target ${inr(target)}`,
-        `Usage ${usage.kmMonth} km/mo`,
+        `Fuel prices: petrol ₹${usage.petrolPrice}/L · diesel ₹${usage.dieselPrice}/L · power ₹${usage.elecPrice}/kWh`,
         "",
         pick
           ? `Lowest-EMI pick: ${pick.name} (${pick.variant}) — EMI ${inr(pick.monthly)} · score ${pick.score} · fuel/power ~ ${pick.runCost != null ? inr(pick.runCost) : "—"}/mo`
@@ -2807,7 +2803,7 @@
     const PREFS_KEY = "suv-compare-prefs-v4";
     const NUMBER_IDS = [
       "sale", "pending", "cash", "rate", "targetEmi", "maxPrice", "ncapMin", "reviewMin",
-      "tenure", "kmMonth", "petrolPrice", "dieselPrice", "elecPrice",
+      "tenure", "petrolPrice", "dieselPrice", "elecPrice",
     ];
     const MUST_IDS = [
       "emiFilter", "emiSoftFilter", "noLuxuryFilter", "midsizeFilter",
@@ -2878,7 +2874,6 @@
 
       const u = ctx.usage || {};
       const usageChanged = [
-        u.kmMonth !== 1200,
         u.petrolPrice !== 102,
         u.dieselPrice !== 90,
         u.elecPrice !== 8,
