@@ -1,0 +1,3080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SUV Garage — Jaipur Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #12140f;
+      --paper: #f3efe6;
+      --sand: #e4dccb;
+      --line: #c9bfae;
+      --moss: #2f5d3a;
+      --moss-deep: #1e3d26;
+      --ember: #c45c26;
+      --muted: #5c574c;
+      --card: #faf7f0;
+      --ok: #2f5d3a;
+      --warn: #9a5b12;
+      --bad: #8b2e1f;
+      --shell: #1a2218;
+      --rail: 300px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Figtree", system-ui, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      min-height: 100vh;
+      line-height: 1.45;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: var(--rail) 1fr;
+      min-height: 100vh;
+    }
+
+    .rail {
+      background: var(--shell);
+      color: #e8ebe4;
+      padding: 28px 20px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+    .rail-brand {
+      font-family: "Archivo Black", sans-serif;
+      font-size: 1.7rem;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+    .rail-brand span {
+      display: block;
+      font-family: "Figtree", sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #9aa894;
+      margin-top: 8px;
+    }
+    .nav { display: grid; gap: 6px; }
+    .nav button {
+      text-align: left;
+      background: transparent;
+      border: 0;
+      color: #c5cec0;
+      font: inherit;
+      font-weight: 600;
+      padding: 11px 12px;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+    }
+    .nav button:hover { color: #fff; background: rgba(255,255,255,0.04); }
+    .nav button.active {
+      color: #fff;
+      border-left-color: #c9a978;
+      background: rgba(255,255,255,0.06);
+    }
+
+    .rail-block h3 {
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #9aa894;
+      margin-bottom: 10px;
+    }
+    .rail label {
+      display: grid;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #9aa894;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 12px;
+    }
+    .rail select,
+    .rail input[type="number"] {
+      appearance: none;
+      width: 100%;
+      background: #243024;
+      border: 1px solid #3a4638;
+      color: #e8ebe4;
+      padding: 10px 12px;
+      font: inherit;
+      font-weight: 600;
+    }
+    .rail select {
+      background: #243024 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='%239aa894' d='M0 0l6 8 6-8z'/%3E%3C/svg%3E") right 12px center / 10px no-repeat;
+      padding-right: 32px;
+    }
+    .rail input[type="number"]::-webkit-outer-spin-button,
+    .rail input[type="number"]::-webkit-inner-spin-button {
+      opacity: 0.6;
+    }
+    .rail input[type="number"]:focus,
+    .rail select:focus {
+      outline: 1px solid #c9a978;
+      border-color: #c9a978;
+    }
+    .field-hint {
+      font-size: 0.72rem;
+      color: #8a9484;
+      font-weight: 500;
+      text-transform: none;
+      letter-spacing: 0;
+      margin-top: -4px;
+      margin-bottom: 10px;
+    }
+    .rail .checks { display: grid; gap: 8px; }
+    .rail .filter-actions {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .rail .ghost-btn {
+      flex: 1;
+      min-width: 0;
+      background: transparent;
+      border: 1px solid #4a5648;
+      color: #c9d0c4;
+      padding: 7px 6px;
+      font: inherit;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .rail .ghost-btn:hover { border-color: #c9a978; color: #f0e6d4; }
+    .rail .ghost-btn.accent {
+      border-color: #c9a978;
+      color: #f0e6d4;
+      background: rgba(201, 169, 120, 0.12);
+    }
+
+    #mustBlock {
+      background: linear-gradient(180deg, #1f291e 0%, #1a2218 40%);
+      border: 1px solid #324032;
+      padding: 14px 12px 12px;
+      margin: 0 -4px;
+    }
+    #mustBlock > h3 {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    #mustBlock > h3 .filter-mode {
+      font-family: "Figtree", sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.06em;
+      color: #c9a978;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .rail .active-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      min-height: 0;
+      margin-bottom: 10px;
+    }
+    .rail .active-chips:empty { display: none; }
+    .rail .active-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(201, 169, 120, 0.16);
+      border: 1px solid #c9a978;
+      color: #f0e6d4;
+      padding: 4px 8px 4px 10px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      max-width: 100%;
+    }
+    .rail .active-chip button {
+      background: transparent;
+      border: 0;
+      color: #c9a978;
+      cursor: pointer;
+      font-size: 0.85rem;
+      line-height: 1;
+      padding: 0 0 0 2px;
+    }
+
+    .rail .filter-acc {
+      border: 1px solid #324032;
+      background: #1c261c;
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+    .rail .filter-acc[open] {
+      border-color: #3f4f3c;
+    }
+    .rail .filter-acc > summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #9aa894;
+      font-weight: 700;
+      user-select: none;
+    }
+    .rail .filter-acc > summary::-webkit-details-marker { display: none; }
+    .rail .filter-acc > summary::after {
+      content: "+";
+      margin-left: auto;
+      color: #c9a978;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+    .rail .filter-acc[open] > summary::after { content: "–"; }
+    .rail .filter-acc > summary .acc-count {
+      background: #2f3c2e;
+      color: #c9d0c4;
+      padding: 2px 7px;
+      font-size: 0.65rem;
+      font-variant-numeric: tabular-nums;
+      min-width: 1.4rem;
+      text-align: center;
+    }
+    .rail .filter-acc > summary .acc-count.on {
+      background: #c9a978;
+      color: #1a2218;
+    }
+    .rail .filter-acc .acc-body {
+      padding: 0 10px 12px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .rail .chip-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .rail .chip {
+      position: relative;
+      margin: 0;
+      cursor: pointer;
+      text-transform: none;
+      letter-spacing: 0;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #c5cec0;
+    }
+    .rail .chip input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .rail .chip span {
+      display: inline-block;
+      background: #243024;
+      border: 1px solid #3a4638;
+      padding: 7px 10px;
+      transition: border-color 0.15s, background 0.15s, color 0.15s, box-shadow 0.15s;
+    }
+    .rail .chip:hover span {
+      border-color: #5a6a56;
+      color: #f0e6d4;
+    }
+    .rail .chip input:checked + span {
+      background: rgba(201, 169, 120, 0.18);
+      border-color: #c9a978;
+      color: #f7efdf;
+      box-shadow: inset 0 0 0 1px rgba(201, 169, 120, 0.25);
+    }
+    .rail .chip input:focus-visible + span {
+      outline: 1px solid #c9a978;
+      outline-offset: 2px;
+    }
+
+    .rail .seg {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
+    }
+    .rail .seg button {
+      background: #243024;
+      border: 1px solid #3a4638;
+      color: #9aa894;
+      padding: 8px 2px;
+      font: inherit;
+      font-size: 0.65rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+    }
+    .rail .seg button:hover { color: #e8ebe4; border-color: #5a6a56; }
+    .rail .seg button.on {
+      background: rgba(201, 169, 120, 0.18);
+      border-color: #c9a978;
+      color: #f7efdf;
+    }
+
+    .rail .price-chips {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+    }
+    .rail .price-chips button {
+      background: #243024;
+      border: 1px solid #3a4638;
+      color: #9aa894;
+      padding: 7px 4px;
+      font: inherit;
+      font-size: 0.68rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .rail .price-chips button.on,
+    .rail .price-chips button:hover {
+      border-color: #c9a978;
+      color: #f0e6d4;
+    }
+
+    .rail .slider-field {
+      background: #243024;
+      border: 1px solid #3a4638;
+      padding: 10px 12px;
+    }
+    .rail .slider-field .slider-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #e8ebe4;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    .rail .slider-field strong {
+      color: #c9a978;
+      font-variant-numeric: tabular-nums;
+    }
+    .rail .slider-field input[type="range"] {
+      width: 100%;
+      accent-color: #c9a978;
+      margin: 0;
+      height: 4px;
+    }
+    .rail .slider-field .slider-scale {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+      font-size: 0.62rem;
+      color: #8a9484;
+      font-weight: 600;
+    }
+    .rail .ncap-stars {
+      display: flex;
+      gap: 3px;
+      margin-top: 8px;
+    }
+    .rail .ncap-stars i {
+      flex: 1;
+      height: 4px;
+      background: #3a4638;
+    }
+    .rail .ncap-stars i.on { background: #c9a978; }
+
+    .rail .match-pill {
+      position: sticky;
+      bottom: 0;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: #243024;
+      border: 1px solid #c9a978;
+      padding: 12px 12px;
+      margin-top: 10px;
+      box-shadow: 0 -8px 24px rgba(0,0,0,0.35);
+    }
+    .rail .match-pill strong {
+      font-family: "Archivo Black", sans-serif;
+      font-size: 1.15rem;
+      color: #f0e6d4;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .rail .match-pill span {
+      font-size: 0.7rem;
+      color: #8a9484;
+      display: block;
+      margin-top: 4px;
+    }
+    .rail .match-pill .match-bar {
+      height: 3px;
+      background: #3a4638;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .rail .match-pill .match-bar > i {
+      display: block;
+      height: 100%;
+      background: #c9a978;
+      width: 0;
+      transition: width 0.25s ease;
+    }
+    .rail .match-pill .match-go {
+      flex: 0 0 auto;
+      background: rgba(201, 169, 120, 0.16);
+      border: 1px solid #c9a978;
+      color: #f0e6d4;
+      padding: 10px 14px;
+      font: inherit;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .rail .match-pill .match-go:hover {
+      background: rgba(201, 169, 120, 0.28);
+    }
+    .rail-foot {
+      margin-top: auto;
+      font-size: 0.78rem;
+      color: #8a9484;
+      line-height: 1.5;
+      padding-top: 16px;
+      border-top: 1px solid #3a4638;
+    }
+
+    .main {
+      padding: 28px 32px 56px;
+      background:
+        radial-gradient(ellipse 70% 40% at 0% 0%, #dfe8d8 0%, transparent 55%),
+        radial-gradient(ellipse 50% 30% at 100% 0%, #e8d9c8 0%, transparent 45%),
+        var(--paper);
+      min-width: 0;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+    }
+    .topbar h1 {
+      font-family: "Archivo Black", sans-serif;
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+    .topbar p { color: var(--muted); margin-top: 6px; max-width: 48ch; }
+    .pill-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .pill {
+      background: var(--sand);
+      border: 1px solid var(--line);
+      padding: 8px 12px;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    .pill.em { background: var(--moss); color: #f4f7f1; border-color: var(--moss); }
+
+    .panel { display: none; animation: in 0.28s ease; }
+    .panel.active { display: block; }
+    @keyframes in {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .kpi {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+    .kpi > div, .panel-box {
+      background: var(--card);
+      border: 1px solid var(--line);
+      padding: 16px;
+    }
+    .kpi b {
+      display: block;
+      font-family: "Archivo Black", sans-serif;
+      font-size: 1.45rem;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+    .kpi span, .muted { color: var(--muted); font-size: 0.82rem; }
+    .avg-box {
+      background: var(--card);
+      border: 1px solid var(--line);
+      padding: 16px 18px;
+      margin-bottom: 22px;
+    }
+    .avg-box .avg-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .avg-box h2 {
+      font-family: "Archivo Black", sans-serif;
+      font-size: 1.05rem;
+      letter-spacing: -0.02em;
+      margin: 0;
+    }
+    .avg-box .live-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--moss);
+    }
+    .avg-box .live-dot::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #3d8f4a;
+      box-shadow: 0 0 0 0 rgba(61, 143, 74, 0.55);
+      animation: pulse 1.6s ease infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(61, 143, 74, 0.45); }
+      70% { box-shadow: 0 0 0 8px rgba(61, 143, 74, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(61, 143, 74, 0); }
+    }
+    .avg-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .avg-grid > div {
+      background: var(--sand);
+      border: 1px solid var(--line);
+      padding: 12px 14px;
+    }
+    .avg-grid b {
+      display: block;
+      font-family: "Archivo Black", sans-serif;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+      margin-bottom: 2px;
+    }
+    .avg-grid span { color: var(--muted); font-size: 0.78rem; }
+    @media (max-width: 900px) {
+      .avg-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    .status-bar {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .status-bar > div {
+      background: var(--card);
+      border: 1px solid var(--line);
+      padding: 12px 14px;
+      min-width: 0;
+    }
+    .status-bar small {
+      display: block;
+      font-size: 0.68rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .status-bar strong {
+      font-family: "Archivo Black", sans-serif;
+      font-size: 1.05rem;
+      letter-spacing: -0.02em;
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .status-bar em {
+      font-style: normal;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .insight-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+    .insight {
+      background: var(--card);
+      border: 1px solid var(--line);
+      padding: 14px 16px;
+    }
+    .insight b {
+      display: block;
+      font-family: "Archivo Black", sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+    .insight span { color: var(--muted); font-size: 0.78rem; }
+    .insight .spark {
+      margin-top: 10px;
+      height: 6px;
+      background: var(--sand);
+      overflow: hidden;
+    }
+    .insight .spark > i {
+      display: block;
+      height: 100%;
+      background: var(--moss);
+    }
+
+    .brand-bars { display: grid; gap: 8px; }
+    .brand-bars .row {
+      display: grid;
+      grid-template-columns: 88px 1fr 36px;
+      gap: 10px;
+      align-items: center;
+      font-size: 0.86rem;
+      font-weight: 600;
+    }
+    .brand-bars .track {
+      height: 10px;
+      background: var(--sand);
+      overflow: hidden;
+    }
+    .brand-bars .fill {
+      height: 100%;
+      background: var(--moss);
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .toolbar .count { font-weight: 700; color: var(--muted); font-size: 0.9rem; }
+    .toolbar-left { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; flex: 1; }
+    .search-input {
+      min-width: 200px;
+      flex: 1;
+      max-width: 320px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      padding: 10px 12px;
+      font: inherit;
+      font-weight: 600;
+    }
+    .search-input:focus { outline: 1px solid var(--moss); border-color: var(--moss); }
+    .sort-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+    .sort-btns button {
+      background: var(--card);
+      border: 1px solid var(--line);
+      padding: 8px 12px;
+      font: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--muted);
+    }
+    .sort-btns button.on {
+      background: var(--moss);
+      border-color: var(--moss);
+      color: #f4f7f1;
+    }
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .card-actions button {
+      flex: 1;
+      background: var(--sand);
+      border: 1px solid var(--line);
+      padding: 8px 10px;
+      font: inherit;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    .card-actions button.on-cmp {
+      background: var(--moss);
+      border-color: var(--moss);
+      color: #f4f7f1;
+    }
+    .card-actions button:hover { border-color: var(--moss); }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .compare-slot {
+      background: var(--card);
+      border: 1px dashed var(--line);
+      padding: 18px;
+      min-height: 280px;
+    }
+    .compare-slot.filled { border-style: solid; }
+    .compare-slot h3 {
+      font-family: "Archivo Black", sans-serif;
+      font-size: 1.2rem;
+      letter-spacing: -0.02em;
+      margin: 6px 0 4px;
+    }
+    .compare-slot .empty-slot {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 40px;
+      text-align: center;
+    }
+    .cmp-rows { display: grid; gap: 8px; margin-top: 14px; }
+    .cmp-rows div {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.86rem;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--sand);
+    }
+    .cmp-rows span { color: var(--muted); }
+    .cmp-rows strong { font-variant-numeric: tabular-nums; }
+
+    .bucket-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .bucket-grid > div {
+      background: var(--sand);
+      border: 1px solid var(--line);
+      padding: 12px;
+      text-align: center;
+    }
+    .bucket-grid b {
+      display: block;
+      font-family: "Archivo Black", sans-serif;
+      font-size: 1.35rem;
+    }
+    .bucket-grid span { font-size: 0.75rem; color: var(--muted); }
+
+    .quick-links { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .quick-links button {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #e8ebe4;
+      padding: 8px 12px;
+      font: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .quick-links button:hover { border-color: #c9a978; color: #fff; }
+
+    @media (max-width: 1100px) {
+      .status-bar, .insight-grid, .compare-grid, .bucket-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+    .panel-box h2, .sec-title {
+      font-family: "Archivo Black", sans-serif;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+    .rec-box {
+      background: var(--moss-deep);
+      color: #f2f5ef;
+      padding: 22px;
+      border: 1px solid var(--moss-deep);
+    }
+    .rec-box h2 { color: #fff; margin-bottom: 8px; }
+    .rec-box p { color: #c9d4c4; margin-bottom: 14px; max-width: 48ch; }
+    .rec-meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .rec-meta div {
+      background: rgba(255,255,255,0.08);
+      padding: 12px;
+    }
+    .rec-meta small {
+      display: block;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #a8b8a4;
+      margin-bottom: 4px;
+    }
+    .rec-meta strong { font-size: 1.1rem; }
+
+    .stack-rows { display: grid; gap: 10px; }
+    .stack-rows .row {
+      display: grid;
+      grid-template-columns: 110px 1fr 70px;
+      gap: 10px;
+      align-items: center;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .track {
+      height: 12px;
+      background: var(--sand);
+      overflow: hidden;
+    }
+    .fill {
+      height: 100%;
+      background: var(--moss);
+      transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .fill.hot { background: var(--ember); }
+    .fill.gold { background: #c9a978; }
+
+    .budget-list { display: grid; gap: 10px; }
+    .budget-list li {
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+      font-weight: 600;
+    }
+    .budget-list li:last-child { border-bottom: 0; }
+    .budget-list .pos { color: var(--ok); }
+    .budget-list .neg { color: var(--bad); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 14px;
+    }
+    .car {
+      background: var(--card);
+      border: 1px solid var(--line);
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+      position: relative;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+    .car:hover { transform: translateY(-2px); border-color: var(--moss); }
+    .car.pick {
+      border-width: 2px;
+      border-color: var(--moss);
+      background: linear-gradient(165deg, #f7faf5 0%, var(--card) 50%);
+    }
+    .car.pick::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 5px;
+      background: var(--moss);
+    }
+    .badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: var(--ember);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 5px 8px;
+    }
+    .brand-chip {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ember);
+    }
+    .car h3 {
+      font-family: "Archivo Black", sans-serif;
+      font-size: 1.3rem;
+      letter-spacing: -0.02em;
+      padding-right: 64px;
+    }
+    .variant { color: var(--muted); font-size: 0.9rem; margin-top: -6px; }
+    .tag {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 3px 7px;
+      background: var(--sand);
+      color: var(--moss-deep);
+      margin: 0 6px 6px 0;
+    }
+    .tag.off { color: var(--muted); opacity: 0.7; }
+    .meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .meta div { background: var(--sand); padding: 10px; }
+    .meta small {
+      display: block;
+      color: var(--muted);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 2px;
+    }
+    .delta.ok { color: var(--ok); }
+    .delta.warn { color: var(--warn); }
+    .delta.bad { color: var(--bad); }
+    .note { font-size: 0.9rem; color: var(--muted); }
+    .review {
+      margin-top: 12px;
+      padding: 12px;
+      background: var(--sand);
+      border: 1px solid var(--line);
+    }
+    .review-top {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .review-top strong {
+      font-family: "Archivo Black", sans-serif;
+      font-size: 1.05rem;
+      letter-spacing: -0.02em;
+    }
+    .review-top small {
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+    .review p {
+      font-size: 0.84rem;
+      color: var(--ink);
+      line-height: 1.4;
+      font-style: italic;
+    }
+    .review .rev-src {
+      margin-top: 6px;
+      font-size: 0.7rem;
+      color: var(--muted);
+      font-style: normal;
+      font-weight: 600;
+    }
+    .rec-box .review {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.12);
+      margin-top: 14px;
+    }
+    .rec-box .review p { color: #d5ddd0; }
+    .rec-box .review .rev-src,
+    .rec-box .review-top small { color: #a8b8a4; }
+    .rec-box .review-top strong { color: #f2f5ef; }
+
+    .timeline { display: grid; gap: 0; }
+    .tl-item {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 14px;
+      padding-bottom: 22px;
+    }
+    .tl-dot {
+      width: 14px;
+      height: 14px;
+      margin-top: 4px;
+      border-radius: 50%;
+      background: var(--moss);
+      box-shadow: 0 0 0 4px #d7e3d4;
+      position: relative;
+    }
+    .tl-item:not(:last-child) .tl-dot::after {
+      content: "";
+      position: absolute;
+      left: 6px;
+      top: 18px;
+      width: 2px;
+      height: calc(100% + 8px);
+      background: var(--line);
+    }
+    .tl-item h3 { font-size: 1rem; margin-bottom: 4px; }
+    .tl-item p { color: var(--muted); font-size: 0.92rem; }
+    .checklist { display: grid; gap: 8px; margin-top: 10px; }
+    .checklist label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--sand);
+      padding: 10px 12px;
+      font-weight: 600;
+      cursor: pointer;
+      text-transform: none;
+      letter-spacing: 0;
+      color: var(--ink);
+      font-size: 0.92rem;
+    }
+    .checklist input { accent-color: var(--moss); width: 16px; height: 16px; }
+
+    .empty {
+      padding: 36px;
+      border: 1px dashed var(--line);
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .fuel-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .fuel-pills span {
+      background: var(--sand);
+      padding: 8px 12px;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    @media (max-width: 1100px) {
+      .app { grid-template-columns: 1fr; }
+      .rail {
+        position: relative;
+        height: auto;
+        max-height: none;
+      }
+      .kpi, .split, .grid { grid-template-columns: 1fr; }
+      .rec-meta { grid-template-columns: 1fr; }
+    }
+
+    .seg-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+    .seg-row button {
+      flex: 1;
+      min-width: 56px;
+      background: #243028;
+      border: 1px solid #3a4a3e;
+      color: #c5cec0;
+      font: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 8px 6px;
+      cursor: pointer;
+    }
+    .seg-row button.on {
+      background: var(--moss);
+      border-color: var(--moss);
+      color: #fff;
+    }
+
+    .score-list { display: grid; gap: 10px; }
+    .score-row {
+      display: grid;
+      grid-template-columns: 36px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      background: var(--sand);
+      border: 1px solid var(--line);
+    }
+    .score-row .rank {
+      font-family: "Archivo Black", sans-serif;
+      font-size: 1.1rem;
+      color: var(--moss-deep);
+    }
+    .score-row .score-bar {
+      height: 6px;
+      background: #d5cebf;
+      margin-top: 6px;
+      overflow: hidden;
+    }
+    .score-row .score-bar i {
+      display: block;
+      height: 100%;
+      background: var(--moss);
+    }
+    .score-row strong.score-num {
+      font-variant-numeric: tabular-nums;
+      font-size: 1.15rem;
+    }
+    .watch-list { display: grid; gap: 10px; }
+    .watch-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 12px;
+      border: 1px solid var(--line);
+      background: var(--card);
+    }
+    .watch-item .watch-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tools-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .tools-actions button,
+    .watch-item button {
+      background: var(--sand);
+      border: 1px solid var(--line);
+      font: inherit;
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+    .scenario-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    @media (max-width: 900px) {
+      .scenario-grid { grid-template-columns: 1fr; }
+    }
+    .scenario-card {
+      text-align: left;
+      background: var(--sand);
+      border: 1px solid var(--line);
+      padding: 14px;
+      cursor: pointer;
+      font: inherit;
+    }
+    .scenario-card.on {
+      border-color: var(--moss);
+      background: #e8f0e6;
+      box-shadow: inset 0 0 0 1px var(--moss);
+    }
+    .scenario-card b {
+      display: block;
+      font-family: "Archivo Black", sans-serif;
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+    .scenario-card span {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--shell);
+      color: #e8ebe4;
+      padding: 12px 16px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      z-index: 40;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="rail">
+      <div class="rail-brand">
+        Garage
+        <span>Jaipur · Nov move</span>
+      </div>
+
+      <nav class="nav" id="nav">
+        <button type="button" data-panel="overview" class="active">Overview</button>
+        <button type="button" data-panel="garage">Garage</button>
+        <button type="button" data-panel="compare">Compare</button>
+        <button type="button" data-panel="decide">Decide</button>
+        <button type="button" data-panel="plan">November plan</button>
+      </nav>
+
+      <div class="rail-block">
+        <h3>Deal inputs</h3>
+        <label>
+          EV Max sale (₹)
+          <input type="number" id="sale" min="500000" max="1500000" step="10000" value="900000" />
+        </label>
+        <p class="field-hint">Typical Jaipur range ₹8–10.5L</p>
+        <label>
+          Old loan pending (₹)
+          <input type="number" id="pending" min="0" max="1500000" step="1000" value="306000" />
+        </label>
+        <p class="field-hint">Update from bank foreclosure letter</p>
+        <label>
+          Your cash (₹)
+          <input type="number" id="cash" min="0" max="2000000" step="10000" value="200000" />
+        </label>
+        <p class="field-hint">Extra cash toward down payment</p>
+        <label>
+          Bank rate (% p.a.)
+          <input type="number" id="rate" min="7" max="14" step="0.05" value="8.75" />
+        </label>
+        <p class="field-hint">Common car loan band 8.5–10.5%</p>
+        <label>
+          Target EMI (₹ / mo)
+          <input type="number" id="targetEmi" min="5000" max="100000" step="500" value="24000" />
+        </label>
+        <p class="field-hint">Your comfort ceiling for the new loan</p>
+        <input type="hidden" id="tenure" value="84" />
+      </div>
+
+      <div class="rail-block" id="mustBlock">
+        <h3>Must-have filters <span class="filter-mode">AND logic</span></h3>
+
+        <div class="active-chips" id="activeChips"></div>
+
+        <div class="filter-actions">
+          <button type="button" id="mustAll" class="ghost-btn">Features on</button>
+          <button type="button" id="mustClear" class="ghost-btn">Clear all</button>
+        </div>
+
+        <details class="filter-acc" open data-acc="budget">
+          <summary>Budget &amp; scope <em class="acc-count" data-acc-count="budget">0</em></summary>
+          <div class="acc-body">
+            <div class="chip-grid">
+              <label class="chip"><input type="checkbox" id="emiFilter" /><span>EMI ≤ target</span></label>
+              <label class="chip"><input type="checkbox" id="emiSoftFilter" /><span>EMI ≤ +15%</span></label>
+              <label class="chip"><input type="checkbox" id="noLuxuryFilter" /><span>No luxury</span></label>
+              <label class="chip"><input type="checkbox" id="midsizeFilter" /><span>Midsize+</span></label>
+            </div>
+            <div>
+              <div class="slider-top" style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:0.72rem;color:#9aa894;font-weight:700;letter-spacing:0.04em;text-transform:uppercase">
+                <span>Max on-road</span>
+                <strong id="maxPriceLabel" style="color:#c9a978;text-transform:none;letter-spacing:0">No cap</strong>
+              </div>
+              <div class="price-chips" id="priceChips">
+                <button type="button" data-price="0" class="on">No cap</button>
+                <button type="button" data-price="2000000">₹20L</button>
+                <button type="button" data-price="2500000">₹25L</button>
+                <button type="button" data-price="3000000">₹30L</button>
+                <button type="button" data-price="3500000">₹35L</button>
+                <button type="button" data-price="custom">Custom</button>
+              </div>
+              <input type="number" id="maxPrice" min="0" max="20000000" step="50000" value="0" style="margin-top:8px;display:none" />
+            </div>
+          </div>
+        </details>
+
+        <details class="filter-acc" open data-acc="usage">
+          <summary>Usage (running cost) <em class="acc-count" data-acc-count="usage">0</em></summary>
+          <div class="acc-body">
+            <label>
+              Km / month
+              <input type="number" id="kmMonth" min="200" max="5000" step="50" value="1200" />
+            </label>
+            <label>
+              City driving %
+              <input type="number" id="cityShare" min="0" max="100" step="5" value="70" />
+            </label>
+            <label>
+              Petrol ₹/L
+              <input type="number" id="petrolPrice" min="50" max="200" step="1" value="102" />
+            </label>
+            <label>
+              Diesel ₹/L
+              <input type="number" id="dieselPrice" min="50" max="200" step="1" value="90" />
+            </label>
+            <label style="margin-bottom:0">
+              Home power ₹/kWh
+              <input type="number" id="elecPrice" min="3" max="30" step="0.5" value="8" />
+            </label>
+          </div>
+        </details>
+
+        <details class="filter-acc" open data-acc="power">
+          <summary>Powertrain <em class="acc-count" data-acc-count="power">0</em></summary>
+          <div class="acc-body">
+            <div>
+              <div style="font-size:0.68rem;letter-spacing:0.06em;text-transform:uppercase;color:#7d8878;font-weight:700;margin-bottom:6px">Fuel</div>
+              <div class="seg" id="fuelSeg">
+                <button type="button" data-fuel="all" class="on">All</button>
+                <button type="button" data-fuel="Diesel">Diesel</button>
+                <button type="button" data-fuel="Petrol">Petrol</button>
+                <button type="button" data-fuel="Hybrid">Hybrid</button>
+                <button type="button" data-fuel="Electric">EV</button>
+              </div>
+              <select id="fuelFilter" hidden>
+                <option value="all" selected>All fuels</option>
+                <option value="Diesel">Diesel</option>
+                <option value="Petrol">Petrol</option>
+                <option value="Hybrid">Hybrid</option>
+                <option value="Electric">Electric</option>
+              </select>
+            </div>
+            <div class="chip-grid">
+              <label class="chip"><input type="checkbox" id="autoFilter" /><span>Automatic</span></label>
+              <label class="chip"><input type="checkbox" id="sevenFilter" /><span>6/7 seater</span></label>
+            </div>
+          </div>
+        </details>
+
+        <details class="filter-acc" open data-acc="cabin">
+          <summary>Cabin comfort <em class="acc-count" data-acc-count="cabin">0</em></summary>
+          <div class="acc-body">
+            <div class="chip-grid">
+              <label class="chip"><input type="checkbox" id="ventFilter" /><span>Ventilated</span></label>
+              <label class="chip"><input type="checkbox" id="carplayFilter" /><span>Wireless AA/CP</span></label>
+              <label class="chip"><input type="checkbox" id="blindFilter" /><span>Rear blinds</span></label>
+              <label class="chip"><input type="checkbox" id="powerSeatFilter" /><span>Power seat</span></label>
+              <label class="chip"><input type="checkbox" id="sunroofFilter" /><span>Sunroof</span></label>
+            </div>
+          </div>
+        </details>
+
+        <details class="filter-acc" open data-acc="safety">
+          <summary>Safety <em class="acc-count" data-acc-count="safety">0</em></summary>
+          <div class="acc-body">
+            <div class="chip-grid">
+              <label class="chip"><input type="checkbox" id="adasFilter" /><span>ADAS L2</span></label>
+            </div>
+            <div class="slider-field">
+              <div class="slider-top">
+                <span>Min NCAP</span>
+                <strong id="ncapSliderLabel">Off</strong>
+              </div>
+              <input type="range" id="ncapMin" min="0" max="5" step="1" value="0" />
+              <div class="ncap-stars" id="ncapStars" aria-hidden="true">
+                <i></i><i></i><i></i><i></i><i></i>
+              </div>
+              <div class="slider-scale">
+                <span>Off</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+              </div>
+            </div>
+            <div class="slider-field" style="margin-top:14px">
+              <div class="slider-top">
+                <span>Min owner rating</span>
+                <strong id="reviewSliderLabel">Off</strong>
+              </div>
+              <input type="range" id="reviewMin" min="0" max="5" step="0.1" value="0" />
+              <div class="slider-scale">
+                <span>Off</span><span>4.0</span><span>4.3</span><span>4.5</span><span>4.7</span><span>5</span>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <details class="filter-acc" open data-acc="brand">
+          <summary>Brand <em class="acc-count" data-acc-count="brand">0</em></summary>
+          <div class="acc-body">
+            <label style="margin-bottom:0">
+              Brand
+              <select id="brandFilter">
+                <option value="all" selected>All brands</option>
+              </select>
+            </label>
+          </div>
+        </details>
+
+        <div class="match-pill">
+          <div style="min-width:0;flex:1">
+            <strong id="mustMatchCount">—</strong>
+            <span id="mustMatchHint">matches</span>
+            <div class="match-bar"><i id="mustMatchBar"></i></div>
+          </div>
+          <button type="button" id="mustGoGarage" class="match-go">Garage</button>
+        </div>
+      </div>
+
+      <p class="rail-foot">
+        Trade-out: 2022 Nexon EV Max<br />
+        Loan pending ₹3.06L · Cash ₹2L<br />
+        Target EMI ≈ ₹24,000
+      </p>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h1 id="pageTitle">Overview</h1>
+          <p id="pageSub">Your buying cockpit for a November delivery in Jaipur.</p>
+        </div>
+        <div class="pill-row" id="topPills"></div>
+      </header>
+
+      <div class="status-bar" id="statusBar"></div>
+
+      <!-- OVERVIEW -->
+      <section class="panel active" id="panel-overview">
+        <div class="kpi" id="kpi"></div>
+
+        <div class="insight-grid" id="insights"></div>
+
+        <div class="avg-box">
+          <div class="avg-head">
+            <h2>Live shortlist averages</h2>
+            <span class="live-dot">Updates with filters &amp; inputs</span>
+          </div>
+          <div class="avg-grid" id="liveAvg"></div>
+        </div>
+
+        <div class="split">
+          <div class="rec-box" id="recBox"></div>
+          <div class="panel-box">
+            <h2>Money stack</h2>
+            <ul class="budget-list" id="budgetList"></ul>
+          </div>
+        </div>
+
+        <div class="split">
+          <div class="panel-box">
+            <h2>Closest to target EMI</h2>
+            <div class="stack-rows" id="nearBars"></div>
+          </div>
+          <div class="panel-box">
+            <h2>Fuel &amp; brand mix</h2>
+            <div class="fuel-pills" id="fuelMix"></div>
+            <div class="brand-bars" id="brandBars" style="margin-top:14px"></div>
+            <p class="muted" id="filterSummary"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- GARAGE -->
+      <section class="panel" id="panel-garage">
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <div class="count" id="garageCount"></div>
+            <input type="search" class="search-input" id="garageSearch" placeholder="Search brand, model, fuel…" />
+          </div>
+          <div class="sort-btns" id="sortBtns">
+            <button type="button" data-sort="emi" class="on">EMI ↑</button>
+            <button type="button" data-sort="run">Run cost ↑</button>
+            <button type="button" data-sort="score">Score ↓</button>
+            <button type="button" data-sort="price">Price ↑</button>
+            <button type="button" data-sort="delta">Closest to target</button>
+            <button type="button" data-sort="ncap">NCAP ↓</button>
+            <button type="button" data-sort="review">Owners ↓</button>
+            <button type="button" data-sort="brand">Brand</button>
+          </div>
+        </div>
+        <div class="grid" id="cars"></div>
+      </section>
+
+      <!-- COMPARE -->
+      <section class="panel" id="panel-compare">
+        <div class="panel-box" style="margin-bottom:16px">
+          <h2>Side-by-side shortlist</h2>
+          <p class="muted" id="compareHint">Pin 2–3 cars from Garage. Cards only list fields that differ.</p>
+          <div class="quick-links" style="margin-top:12px">
+            <button type="button" id="clearCompare" style="border-color:var(--line);color:var(--ink);background:var(--sand)">Clear compare</button>
+          </div>
+        </div>
+        <div class="compare-grid" id="compareGrid"></div>
+      </section>
+
+      <!-- DECIDE -->
+      <section class="panel" id="panel-decide">
+        <div class="split" style="margin-bottom:16px">
+          <div class="panel-box">
+            <h2>Decision scoreboard</h2>
+            <p class="muted" style="margin-bottom:12px">Weighted: EMI fit 35 · safety 20 · features 20 · owners 15 · run cost 10.</p>
+            <div class="score-list" id="scoreBoard"></div>
+          </div>
+          <div class="panel-box">
+            <h2>Monthly run cost</h2>
+            <p class="muted" style="margin-bottom:12px">EMI + estimated fuel/power from your km mix. Top of current filter.</p>
+            <div class="stack-rows" id="runBars"></div>
+          </div>
+        </div>
+        <div class="split">
+          <div class="panel-box">
+            <h2>Watchlist</h2>
+            <p class="muted" style="margin-bottom:12px">Save up to 5 contenders from Garage. Local only.</p>
+            <div class="watch-list" id="watchList"></div>
+            <div class="tools-actions">
+              <button type="button" id="clearWatch">Clear watchlist</button>
+              <button type="button" id="watchToCompare">Pin top 3 to compare</button>
+            </div>
+          </div>
+          <div class="panel-box">
+            <h2>Buying brief</h2>
+            <p class="muted" style="margin-bottom:12px">Copy a text summary for family / bank / dealer WhatsApp.</p>
+            <pre id="briefPreview" style="white-space:pre-wrap;font:inherit;font-size:0.86rem;background:var(--sand);border:1px solid var(--line);padding:14px;max-height:280px;overflow:auto"></pre>
+            <div class="tools-actions">
+              <button type="button" id="copyBrief">Copy brief</button>
+              <button type="button" id="printDecide">Print / PDF</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PLAN -->
+      <section class="panel" id="panel-plan">
+        <div class="split">
+          <div class="panel-box">
+            <h2>November path</h2>
+            <div class="timeline">
+              <div class="tl-item">
+                <div class="tl-dot"></div>
+                <div>
+                  <h3>Now → mid October</h3>
+                  <p>Bank foreclosure letter for exact EV payoff date. Get 3 valuations (Tata exchange, CARS24, Spinny Jaipur).</p>
+                </div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot"></div>
+                <div>
+                  <h3>Late October</h3>
+                  <p>Test Sierra Accomplished Diesel AT + one hybrid (Victoris / Hyryder) + Creta/Seltos if you want a second opinion.</p>
+                </div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot"></div>
+                <div>
+                  <h3>Early November</h3>
+                  <p>Lock sealed on-road quote. Loan = on-road − (sale equity + your cash). Prefer putting max down to protect EMI.</p>
+                </div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot"></div>
+                <div>
+                  <h3>Delivery week</h3>
+                  <p>Clear EV loan same day as sale/exchange. Transfer RC. Activate insurance & FASTag on new car.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="panel-box">
+            <h2>Dealer checklist</h2>
+            <div class="checklist" id="checklist">
+              <label><input type="checkbox" data-k="v1" /> 3 EV Max sale quotes in writing</label>
+              <label><input type="checkbox" data-k="v2" /> Foreclosure / NOC letter from bank</label>
+              <label><input type="checkbox" data-k="v3" /> Sierra Accomplished Diesel AT test drive</label>
+              <label><input type="checkbox" data-k="v4" /> Hybrid backup test drive</label>
+              <label><input type="checkbox" data-k="v5" /> Sealed Jaipur on-road quote</label>
+              <label><input type="checkbox" data-k="v6" /> Loan sanction letter @ agreed rate</label>
+              <label><input type="checkbox" data-k="v7" /> Confirm ventilated seats + rear blinds on VIN</label>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const PENDING_DEFAULT = 306000;
+    const CASH_DEFAULT = 200000;
+    const TARGET_DEFAULT = 24000;
+    const COMPARE_KEY = "suv-compare-pins-v1";
+    const WATCH_KEY = "suv-watch-v1";
+    let compareIds = [];
+    let watchIds = [];
+    try {
+      compareIds = JSON.parse(localStorage.getItem(COMPARE_KEY) || "[]");
+      if (!Array.isArray(compareIds)) compareIds = [];
+      compareIds = compareIds.filter((id) => typeof id === "string").slice(0, 3);
+    } catch (_) {
+      compareIds = [];
+    }
+    try {
+      watchIds = JSON.parse(localStorage.getItem(WATCH_KEY) || "[]");
+      if (!Array.isArray(watchIds)) watchIds = [];
+      watchIds = watchIds.filter((id) => typeof id === "string").slice(0, 5);
+    } catch (_) {
+      watchIds = [];
+    }
+
+    // Jaipur on-road ≈ mid–high trim. Features = that trim. Confirm with dealer.
+    const CARS = [
+      // Tata
+      { id: "punch", brand: "Tata", short: "Punch", name: "Tata Punch", variant: "Creative+ S / Fearless · petrol/CNG", price: 1050000, fuel: "Petrol / CNG", mileage: "18–26 kmpl", note: "Micro-SUV — below your upgrade class.", ventilated: false, wirelessCarplay: true, rearBlinds: false, powerSeat: false },
+      { id: "nexon", brand: "Tata", short: "Nexon", name: "Tata Nexon", variant: "Fearless+ PS DT · Diesel AMT", price: 1694000, fuel: "Diesel AMT", mileage: "14 / 18–20 kmpl", note: "Compact — EMI saver vs current outgo.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+      { id: "nexon-ev", brand: "Tata", short: "Nexon.ev", name: "Tata Nexon.ev", variant: "Fearless+ 45 kWh / mid–high", price: 1750000, fuel: "Electric", mileage: "~300–350 km real", note: "Stay EV in Nexon body — little size upgrade.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+      { id: "curvv", brand: "Tata", short: "Curvv", name: "Tata Curvv", variant: "Accomplished+ DCA / Diesel AT", price: 1950000, fuel: "Petrol DCA / Diesel", mileage: "12–16 kmpl", note: "Coupe-SUV — stylish midsize rival.", ventilated: true, wirelessCarplay: true, rearBlinds: false, powerSeat: true },
+      { id: "curvv-ev", brand: "Tata", short: "Curvv.ev", name: "Tata Curvv.ev", variant: "Empowered+ 55 kWh", price: 2200000, fuel: "Electric", mileage: "~350–400 km real", note: "EV coupe-SUV — needs home charging.", ventilated: true, wirelessCarplay: true, rearBlinds: false, powerSeat: true },
+      { id: "sierra-acc", brand: "Tata", short: "Sierra Acc", name: "Tata Sierra", variant: "Accomplished Diesel AT · Kryojet TC", price: 2357000, fuel: "Diesel TC-AT", mileage: "11.2 / 15.4 kmpl", note: "Full must-have set — vents, blinds, ADAS, power seat, sunroof.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+      { id: "harrier", brand: "Tata", short: "Harrier", name: "Tata Harrier", variant: "Fearless+ DCA / Diesel AT", price: 2650000, fuel: "Petrol DCA / Diesel AT", mileage: "11–15 kmpl", note: "Larger midsize — more space, higher EMI.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+      { id: "safari", brand: "Tata", short: "Safari", name: "Tata Safari", variant: "Accomplished+ Diesel AT · 6/7 seat", price: 2800000, fuel: "Diesel AT", mileage: "11–14 kmpl", note: "7-seat flagship Tata — EMI stretch.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+
+      // Maruti Suzuki
+      { id: "brezza", brand: "Maruti", short: "Brezza", name: "Maruti Brezza", variant: "ZXi+ AT · mild hybrid", price: 1450000, fuel: "Petrol AT", mileage: "17–19 kmpl", note: "Subcompact Arena staple — smaller cabin.", ventilated: false, wirelessCarplay: true, rearBlinds: false, powerSeat: false },
+      { id: "fronx", brand: "Maruti", short: "Fronx", name: "Maruti Fronx", variant: "Alpha Dual Tone AT / Turbo", price: 1350000, fuel: "Petrol AT", mileage: "18–21 kmpl", note: "Coupe-ish subcompact — youth skew.", ventilated: false, wirelessCarplay: true, rearBlinds: false, powerSeat: false },
+      { id: "jimny", brand: "Maruti", short: "Jimny", name: "Maruti Jimny", variant: "Alpha AT · 4WD", price: 1550000, fuel: "Petrol AT 4WD", mileage: "14–16 kmpl", note: "Lifestyle off-roader — not a family midsize.", ventilated: false, wirelessCarplay: true, rearBlinds: false, powerSeat: false },
+      { id: "victoris", brand: "Maruti", short: "Victoris", name: "Maruti Victoris", variant: "ZXi+ Strong Hybrid e-CVT", price: 2240000, fuel: "Strong Hybrid", mileage: "20.3 / 22.8 kmpl", note: "Arena midsize hybrid — Plan B to Sierra.", ventilated: true, wirelessCarplay: true, rearBlinds: false, powerSeat: true },
+      { id: "vitara", brand: "Maruti", short: "G. Vitara", name: "Maruti Grand Vitara", variant: "Alpha+ Strong Hybrid e-CVT", price: 2200000, fuel: "Strong Hybrid", mileage: "~20 / 22 kmpl", note: "Nexa hybrid — proven ownership.", ventilated: true, wirelessCarplay: true, rearBlinds: false, powerSeat: true },
+      { id: "invicto", brand: "Maruti", short: "Invicto", name: "Maruti Invicto", variant: "Zeta+ / Alpha Strong Hybrid", price: 3200000, fuel: "Strong Hybrid", mileage: "20–23 kmpl", note: "MPV stretch — big cabin, big EMI.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+
+      // Toyota
+      { id: "hyryder", brand: "Toyota", short: "Hyryder", name: "Toyota Hyryder", variant: "V e-Drive Strong Hybrid", price: 2250000, fuel: "Strong Hybrid", mileage: "~20 / 22 kmpl", note: "Toyota midsize hybrid — strong resale.", ventilated: true, wirelessCarplay: true, rearBlinds: false, powerSeat: true },
+      { id: "rumion", brand: "Toyota", short: "Rumion", name: "Toyota Rumion", variant: "V AT / CNG", price: 1450000, fuel: "Petrol AT / CNG", mileage: "18–26 kmpl", note: "MPV twin of Ertiga — not an SUV.", ventilated: false, wirelessCarplay: true, rearBlinds: false, powerSeat: false },
+      { id: "hycross", brand: "Toyota", short: "Hycross", name: "Toyota Innova Hycross", variant: "ZX Hybrid", price: 3400000, fuel: "Strong Hybrid", mileage: "19–23 kmpl", note: "Premium MPV stretch — family king.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+      { id: "fortuner", brand: "Toyota", short: "Fortuner", name: "Toyota Fortuner", variant: "Legender 4x2 AT diesel", price: 4500000, fuel: "Diesel AT", mileage: "10–14 kmpl", note: "Body-on-frame stretch — far above EMI target.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+
+      // Mahindra
+      { id: "xuv3xo", brand: "Mahindra", short: "XUV 3XO", name: "Mahindra XUV 3XO", variant: "AX7 L AT", price: 1650000, fuel: "Petrol / Diesel AT", mileage: "12–18 kmpl", note: "Feature-loaded compact.", ventilated: true, wirelessCarplay: true, rearBlinds: false, powerSeat: true },
+      { id: "thar", brand: "Mahindra", short: "Thar", name: "Mahindra Thar", variant: "LX Soft Top / Hard Top AT", price: 1850000, fuel: "Petrol / Diesel AT", mileage: "12–15 kmpl", note: "Lifestyle off-roader — weekend toy.", ventilated: false, wirelessCarplay: true, rearBlinds: false, powerSeat: false },
+      { id: "thar-roxx", brand: "Mahindra", short: "Thar ROXX", name: "Mahindra Thar ROXX", variant: "AX7 L AT", price: 2300000, fuel: "Petrol / Diesel AT", mileage: "12–15 kmpl", note: "5-door Thar — rugged midsize.", ventilated: true, wirelessCarplay: true, rearBlinds: false, powerSeat: true },
+      { id: "scorpio-n", brand: "Mahindra", short: "Scorpio-N", name: "Mahindra Scorpio-N", variant: "Z8 L AT diesel", price: 2550000, fuel: "Diesel AT", mileage: "12–15 kmpl", note: "Road presence king — thirstier.", ventilated: true, wirelessCarplay: true, rearBlinds: false, powerSeat: true },
+      { id: "xuv700", brand: "Mahindra", short: "XUV 7XO", name: "Mahindra XUV 7XO", variant: "AX7 L AT petrol/diesel", price: 2750000, fuel: "Petrol / Diesel AT", mileage: "11–15 kmpl", note: "7-seat tech SUV — EMI stretch.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+      { id: "be6", brand: "Mahindra", short: "BE 6", name: "Mahindra BE 6", variant: "Pack Three · 79 kWh", price: 2850000, fuel: "Electric", mileage: "~430 / 510 km real", note: "EV coupe — needs home charging.", ventilated: true, wirelessCarplay: true, rearBlinds: false, powerSeat: true },
+      { id: "xev9e", brand: "Mahindra", short: "XEV 9e", name: "Mahindra XEV 9e", variant: "Pack Three · 79 kWh", price: 3000000, fuel: "Electric", mileage: "~450–550 km real", note: "Larger EV SUV — bigger EMI hit.", ventilated: true, wirelessCarplay: true, rearBlinds: false, powerSeat: true },
+      { id: "bolero-neo", brand: "Mahindra", short: "Bolero Neo", name: "Mahindra Bolero Neo", variant: "N10 (O)", price: 1200000, fuel: "Diesel MT", mileage: "15–17 kmpl", note: "Rugged value — basic features.", ventilated: false, wirelessCarplay: false, rearBlinds: false, powerSeat: false },
+
+      // Hyundai
+      { id: "exter", brand: "Hyundai", short: "Exter", name: "Hyundai Exter", variant: "SX(O) Connect Dual Tone", price: 1150000, fuel: "Petrol / CNG", mileage: "18–27 kmpl", note: "Micro-SUV — below upgrade class.", ventilated: false, wirelessCarplay: true, rearBlinds: false, powerSeat: false },
+      { id: "venue", brand: "Hyundai", short: "Venue", name: "Hyundai Venue", variant: "SX(O) DCT / diesel", price: 1450000, fuel: "Petrol DCT / Diesel", mileage: "16–23 kmpl", note: "Subcompact — solid but small.", ventilated: true, wirelessCarplay: true, rearBlinds: false, powerSeat: false },
+      { id: "creta", brand: "Hyundai", short: "Creta", name: "Hyundai Creta", variant: "SX(O) / Knight AT", price: 2100000, fuel: "Petrol DCT / Diesel AT", mileage: "12–18 kmpl", note: "Segment volume leader — aging vs Sierra.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+      { id: "creta-ev", brand: "Hyundai", short: "Creta EV", name: "Hyundai Creta Electric", variant: "Excellence long range", price: 2400000, fuel: "Electric", mileage: "~390–450 km real", note: "EV Creta — familiar ownership.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+      { id: "alcazar", brand: "Hyundai", short: "Alcazar", name: "Hyundai Alcazar", variant: "Signature DCT 6/7 seat", price: 2450000, fuel: "Petrol DCT", mileage: "14–17 kmpl", note: "Creta-based 6/7 seater.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+      { id: "tucson", brand: "Hyundai", short: "Tucson", name: "Hyundai Tucson", variant: "Signature DCT diesel/petrol", price: 3800000, fuel: "Petrol / Diesel AT", mileage: "12–16 kmpl", note: "Premium import-feel stretch.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+
+      // Kia
+      { id: "sonet", brand: "Kia", short: "Sonet", name: "Kia Sonet", variant: "GTX+ DCT / diesel AT", price: 1500000, fuel: "Petrol DCT / Diesel AT", mileage: "16–22 kmpl", note: "Subcompact feature bomb.", ventilated: true, wirelessCarplay: true, rearBlinds: false, powerSeat: true },
+      { id: "syros", brand: "Kia", short: "Syros", name: "Kia Syros", variant: "HTX+ / top AT", price: 1600000, fuel: "Petrol AT", mileage: "16–19 kmpl", note: "New compact Kia — check Jaipur stock.", ventilated: true, wirelessCarplay: true, rearBlinds: false, powerSeat: true },
+      { id: "seltos", brand: "Kia", short: "Seltos", name: "Kia Seltos", variant: "HTX / GTX Diesel AT or Turbo DCT", price: 2160000, fuel: "Diesel AT / Petrol DCT", mileage: "12–18 kmpl", note: "Creta twin — richer cabin.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+      { id: "carens", brand: "Kia", short: "Carens", name: "Kia Carens", variant: "Luxury Plus DCT 6/7 seat", price: 2050000, fuel: "Petrol DCT / Diesel", mileage: "14–18 kmpl", note: "MPV/SUV hybrid shape — space king.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+      { id: "ev6", brand: "Kia", short: "EV6", name: "Kia EV6", variant: "GT-Line AWD", price: 6500000, fuel: "Electric", mileage: "~400–480 km real", note: "Premium EV — far above budget.", ventilated: true, wirelessCarplay: true, rearBlinds: false, powerSeat: true },
+
+      // Honda
+      { id: "elevate", brand: "Honda", short: "Elevate", name: "Honda Elevate", variant: "ZX CVT", price: 1850000, fuel: "Petrol CVT", mileage: "12–16 kmpl", note: "Honda midsize — reliability first.", ventilated: true, wirelessCarplay: true, rearBlinds: false, powerSeat: true },
+
+      // MG
+      { id: "astor", brand: "MG", short: "Astor", name: "MG Astor", variant: "Savvy Pro CVT", price: 1822000, fuel: "Petrol CVT", mileage: "12–15 kmpl", note: "ADAS / AI midsize.", ventilated: true, wirelessCarplay: true, rearBlinds: false, powerSeat: true },
+      { id: "hector", brand: "MG", short: "Hector", name: "MG Hector", variant: "Sharp Pro CVT / DCT", price: 2100000, fuel: "Petrol CVT / DCT", mileage: "11–14 kmpl", note: "Large cabin — soft dynamics.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+      { id: "hector-plus", brand: "MG", short: "Hector+", name: "MG Hector Plus", variant: "Sharp Pro 6/7 seat", price: 2300000, fuel: "Petrol CVT", mileage: "11–14 kmpl", note: "6/7-seat Hector.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+      { id: "zs-ev", brand: "MG", short: "ZS EV", name: "MG ZS EV", variant: "Essence", price: 2400000, fuel: "Electric", mileage: "~350–400 km real", note: "Established MG EV.", ventilated: true, wirelessCarplay: true, rearBlinds: false, powerSeat: true },
+      { id: "windsor", brand: "MG", short: "Windsor", name: "MG Windsor EV", variant: "Essence / Exclusive", price: 1600000, fuel: "Electric", mileage: "~280–330 km real", note: "Value EV — MPV-ish shape.", ventilated: true, wirelessCarplay: true, rearBlinds: false, powerSeat: false },
+
+      // Skoda
+      { id: "kylaq", brand: "Skoda", short: "Kylaq", name: "Skoda Kylaq", variant: "Signature AT / Prestige", price: 1450000, fuel: "Petrol AT", mileage: "16–19 kmpl", note: "Subcompact MQB-A0 — fun drive.", ventilated: false, wirelessCarplay: true, rearBlinds: false, powerSeat: false },
+      { id: "kushaq", brand: "Skoda", short: "Kushaq", name: "Skoda Kushaq", variant: "1.5 TSI Style DSG", price: 2050000, fuel: "Petrol DSG", mileage: "12–16 kmpl", note: "Best drive in class — no vent seats.", ventilated: false, wirelessCarplay: true, rearBlinds: false, powerSeat: true },
+      { id: "kodiaq", brand: "Skoda", short: "Kodiaq", name: "Skoda Kodiaq", variant: "Sportline / Style", price: 4800000, fuel: "Petrol DSG", mileage: "11–14 kmpl", note: "7-seat premium stretch.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+
+      // Volkswagen
+      { id: "taigun", brand: "Volkswagen", short: "Taigun", name: "Volkswagen Taigun", variant: "Topline 1.0 AT / GT 1.5", price: 1970000, fuel: "Petrol AT / DSG", mileage: "12–16 kmpl", note: "Kushaq twin — German tune.", ventilated: false, wirelessCarplay: true, rearBlinds: false, powerSeat: true },
+      { id: "tiguan", brand: "Volkswagen", short: "Tiguan", name: "Volkswagen Tiguan", variant: "Elegance / R-Line", price: 4500000, fuel: "Petrol DSG", mileage: "11–14 kmpl", note: "Premium C-SUV stretch.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+
+      // Renault
+      { id: "kiger", brand: "Renault", short: "Kiger", name: "Renault Kiger", variant: "RXZ Dual Tone Easy-R", price: 1100000, fuel: "Petrol AMT", mileage: "18–20 kmpl", note: "Subcompact value.", ventilated: false, wirelessCarplay: true, rearBlinds: false, powerSeat: false },
+      { id: "duster", brand: "Renault", short: "Duster", name: "Renault Duster", variant: "Iconic / top AT", price: 1900000, fuel: "Petrol AT", mileage: "12–15 kmpl", note: "New-gen Duster — check stock.", ventilated: true, wirelessCarplay: true, rearBlinds: false, powerSeat: true },
+
+      // Citroen
+      { id: "c3", brand: "Citroen", short: "C3", name: "Citroen C3", variant: "Shine Dual Tone", price: 950000, fuel: "Petrol MT", mileage: "18–19 kmpl", note: "Hatch-crossover — basic.", ventilated: false, wirelessCarplay: true, rearBlinds: false, powerSeat: false },
+      { id: "c3-aircross", brand: "Citroen", short: "C3 Aircross", name: "Citroen C3 Aircross", variant: "Max Dual Tone 7 seat", price: 1400000, fuel: "Petrol MT/AT", mileage: "16–18 kmpl", note: "Flexible 5/7 seater value.", ventilated: false, wirelessCarplay: true, rearBlinds: false, powerSeat: false },
+      { id: "basalt", brand: "Citroen", short: "Basalt", name: "Citroen Basalt", variant: "Max Dark Edition AT", price: 1550000, fuel: "Petrol AT", mileage: "16–19 kmpl", note: "Coupe-SUV value play.", ventilated: false, wirelessCarplay: true, rearBlinds: false, powerSeat: false },
+
+      // Jeep
+      { id: "compass", brand: "Jeep", short: "Compass", name: "Jeep Compass", variant: "Limited (O) 2.0 Diesel AT", price: 2850000, fuel: "Diesel AT", mileage: "12–16 kmpl", note: "Premium midsize — EMI stretch.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+      { id: "meridian", brand: "Jeep", short: "Meridian", name: "Jeep Meridian", variant: "Limited (O) 4x4 AT", price: 4200000, fuel: "Diesel AT 4x4", mileage: "11–14 kmpl", note: "7-seat Jeep stretch.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+
+      // Nissan
+      { id: "magnite", brand: "Nissan", short: "Magnite", name: "Nissan Magnite", variant: "Tekna Dual Tone CVT", price: 1200000, fuel: "Petrol CVT", mileage: "16–19 kmpl", note: "Subcompact value.", ventilated: false, wirelessCarplay: true, rearBlinds: false, powerSeat: false },
+      { id: "xtrail", brand: "Nissan", short: "X-Trail", name: "Nissan X-Trail", variant: "Mild Hybrid e-POWER / top", price: 5000000, fuel: "Hybrid", mileage: "16–19 kmpl", note: "Imported premium stretch.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+
+      // Force
+      { id: "gurkha", brand: "Force", short: "Gurkha", name: "Force Gurkha", variant: "5-door AT", price: 2000000, fuel: "Diesel AT", mileage: "12–14 kmpl", note: "Hardcore off-road — niche.", ventilated: false, wirelessCarplay: true, rearBlinds: false, powerSeat: false },
+
+      // BYD
+      { id: "atto3", brand: "BYD", short: "Atto 3", name: "BYD Atto 3", variant: "Superior", price: 2800000, fuel: "Electric", mileage: "~380–450 km real", note: "Blade-battery EV — EMI stretch.", ventilated: true, wirelessCarplay: true, rearBlinds: false, powerSeat: true },
+      { id: "sealion7", brand: "BYD", short: "Sealion 7", name: "BYD Sealion 7", variant: "Premium AWD", price: 5500000, fuel: "Electric", mileage: "~450–550 km real", note: "Performance EV stretch.", ventilated: true, wirelessCarplay: true, rearBlinds: false, powerSeat: true },
+
+      // Volvo
+      { id: "ex30", brand: "Volvo", short: "EX30", name: "Volvo EX30", variant: "Ultra Single Motor", price: 4500000, fuel: "Electric", mileage: "~350–420 km real", note: "Premium compact EV stretch.", ventilated: true, wirelessCarplay: true, rearBlinds: false, powerSeat: true },
+      { id: "xc40", brand: "Volvo", short: "XC40", name: "Volvo XC40 Recharge", variant: "Ultimate", price: 5800000, fuel: "Electric", mileage: "~380–450 km real", note: "Premium C-SUV stretch.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+
+      // BMW
+      { id: "x1", brand: "BMW", short: "X1", name: "BMW X1", variant: "sDrive18i / xDrive20d M Sport", price: 5500000, fuel: "Petrol / Diesel AT", mileage: "12–16 kmpl", note: "Luxury stretch — service cost high.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+
+      // Mercedes-Benz
+      { id: "gla", brand: "Mercedes-Benz", short: "GLA", name: "Mercedes-Benz GLA", variant: "200 / 220d", price: 5600000, fuel: "Petrol / Diesel AT", mileage: "12–16 kmpl", note: "Luxury stretch.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+
+      // Audi
+      { id: "q3", brand: "Audi", short: "Q3", name: "Audi Q3", variant: "Technology / Bold Edition", price: 5200000, fuel: "Petrol AT", mileage: "12–15 kmpl", note: "Luxury stretch.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+
+      // Land Rover
+      { id: "defender", brand: "Land Rover", short: "Defender", name: "Land Rover Defender", variant: "110 X-Dynamic / SE", price: 12000000, fuel: "Petrol / Diesel AT", mileage: "8–12 kmpl", note: "Ultra-premium — not in EMI plan.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+
+      // Isuzu
+      { id: "mux", brand: "Isuzu", short: "mu-X", name: "Isuzu mu-X", variant: "4x2 AT", price: 4200000, fuel: "Diesel AT", mileage: "11–14 kmpl", note: "Body-on-frame 7-seat stretch.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+
+      // Lexuș - skip typo Lexus
+      { id: "lbunx", brand: "Lexus", short: "LBX", name: "Lexus LBX", variant: "Calm / Cool", price: 7000000, fuel: "Hybrid", mileage: "18–22 kmpl", note: "Luxury hybrid stretch.", ventilated: true, wirelessCarplay: true, rearBlinds: true, powerSeat: true },
+    ];
+
+    // Mid–high trim estimates — confirm on VIN / brochure.
+    const NO_SUNROOF = new Set([
+      "punch", "brezza", "fronx", "jimny", "rumion", "thar", "bolero-neo",
+      "exter", "kylaq", "kiger", "c3", "c3-aircross", "basalt", "magnite", "gurkha",
+    ]);
+    const NO_ADAS = new Set([
+      "punch", "brezza", "fronx", "jimny", "rumion", "thar", "bolero-neo",
+      "exter", "venue", "kylaq", "kiger", "c3", "c3-aircross", "basalt", "magnite",
+      "gurkha", "windsor", "duster",
+    ]);
+    CARS.forEach((c) => {
+      c.sunroof = !NO_SUNROOF.has(c.id);
+      c.adas = !NO_ADAS.has(c.id);
+    });
+
+    // Adult star rating. Prefer Bharat NCAP; else Global/Euro NCAP. null = not rated / unknown.
+    const NCAP = {
+      punch: [5, "BNCAP"], nexon: [5, "BNCAP"], "nexon-ev": [5, "BNCAP"],
+      curvv: [5, "BNCAP"], "curvv-ev": [5, "BNCAP"], "sierra-acc": [5, "BNCAP"],
+      harrier: [5, "BNCAP"], safari: [5, "BNCAP"],
+      brezza: [5, "BNCAP"], fronx: [null, "—"], jimny: [null, "—"],
+      victoris: [5, "BNCAP"], vitara: [null, "—"], invicto: [5, "BNCAP"],
+      hyryder: [null, "—"], rumion: [null, "—"], hycross: [5, "BNCAP"], fortuner: [null, "—"],
+      xuv3xo: [5, "BNCAP"], thar: [5, "GNCAP"], "thar-roxx": [5, "BNCAP"],
+      "scorpio-n": [5, "GNCAP"], xuv700: [5, "GNCAP"], be6: [5, "BNCAP"], xev9e: [5, "BNCAP"],
+      "bolero-neo": [null, "—"],
+      exter: [null, "—"], venue: [null, "—"], creta: [3, "GNCAP"], "creta-ev": [null, "—"],
+      alcazar: [null, "—"], tucson: [5, "BNCAP"],
+      sonet: [null, "—"], syros: [5, "BNCAP"], seltos: [5, "BNCAP"], carens: [3, "GNCAP"], ev6: [5, "Euro NCAP"],
+      elevate: [null, "—"],
+      astor: [null, "—"], hector: [null, "—"], "hector-plus": [null, "—"], "zs-ev": [null, "—"], windsor: [null, "—"],
+      kylaq: [5, "BNCAP"], kushaq: [5, "GNCAP"], kodiaq: [5, "Euro NCAP"],
+      taigun: [5, "GNCAP"], tiguan: [5, "Euro NCAP"],
+      kiger: [2, "GNCAP"], duster: [null, "—"],
+      c3: [null, "—"], "c3-aircross": [4, "BNCAP"], basalt: [4, "BNCAP"],
+      compass: [5, "Euro NCAP"], meridian: [5, "Euro NCAP"],
+      magnite: [4, "GNCAP"], xtrail: [5, "Euro NCAP"],
+      gurkha: [null, "—"],
+      atto3: [5, "Euro NCAP"], sealion7: [5, "Euro NCAP"],
+      ex30: [5, "Euro NCAP"], xc40: [5, "Euro NCAP"],
+      x1: [5, "Euro NCAP"], gla: [5, "Euro NCAP"], q3: [5, "Euro NCAP"],
+      defender: [5, "Euro NCAP"], mux: [null, "—"], lbunx: [5, "Euro NCAP"],
+    };
+    CARS.forEach((c) => {
+      const row = NCAP[c.id] || [null, "—"];
+      c.ncapStars = row[0];
+      c.ncapBody = row[1];
+    });
+
+    // Real-world city / highway averages (owner / long-term typical — not ARAI).
+    // unit: kmpl for ICE/hybrid, km for EV range per charge.
+    const REAL_AVG = {
+      punch: [14.5, 18.5, "kmpl"], nexon: [13.5, 18.0, "kmpl"], "nexon-ev": [280, 340, "km"],
+      curvv: [11.5, 15.5, "kmpl"], "curvv-ev": [320, 380, "km"], "sierra-acc": [11.2, 15.4, "kmpl"],
+      harrier: [10.5, 14.5, "kmpl"], safari: [10.0, 13.5, "kmpl"],
+      brezza: [14.5, 18.0, "kmpl"], fronx: [15.0, 19.0, "kmpl"], jimny: [11.5, 14.5, "kmpl"],
+      victoris: [18.5, 22.0, "kmpl"], vitara: [18.0, 21.5, "kmpl"], invicto: [16.5, 20.5, "kmpl"],
+      hyryder: [18.0, 21.5, "kmpl"], rumion: [14.5, 18.5, "kmpl"], hycross: [16.0, 20.0, "kmpl"],
+      fortuner: [8.5, 12.0, "kmpl"],
+      xuv3xo: [12.0, 16.5, "kmpl"], thar: [10.0, 13.5, "kmpl"], "thar-roxx": [10.5, 14.0, "kmpl"],
+      "scorpio-n": [10.5, 14.0, "kmpl"], xuv700: [10.0, 13.5, "kmpl"], be6: [380, 470, "km"],
+      xev9e: [400, 500, "km"], "bolero-neo": [12.5, 15.5, "kmpl"],
+      exter: [15.0, 19.0, "kmpl"], venue: [13.5, 18.0, "kmpl"], creta: [11.5, 15.5, "kmpl"],
+      "creta-ev": [340, 410, "km"], alcazar: [11.0, 14.5, "kmpl"], tucson: [10.5, 14.0, "kmpl"],
+      sonet: [13.5, 18.0, "kmpl"], syros: [13.0, 17.0, "kmpl"], seltos: [11.5, 15.5, "kmpl"],
+      carens: [11.5, 15.0, "kmpl"], ev6: [360, 450, "km"],
+      elevate: [11.5, 15.0, "kmpl"],
+      astor: [11.0, 14.5, "kmpl"], hector: [10.0, 13.5, "kmpl"], "hector-plus": [9.5, 13.0, "kmpl"],
+      "zs-ev": [300, 370, "km"], windsor: [250, 310, "km"],
+      kylaq: [13.5, 17.5, "kmpl"], kushaq: [11.0, 15.0, "kmpl"], kodiaq: [9.5, 13.0, "kmpl"],
+      taigun: [11.0, 15.0, "kmpl"], tiguan: [9.5, 13.0, "kmpl"],
+      kiger: [14.5, 18.0, "kmpl"], duster: [11.0, 14.5, "kmpl"],
+      c3: [14.5, 17.5, "kmpl"], "c3-aircross": [13.0, 16.5, "kmpl"], basalt: [13.0, 16.5, "kmpl"],
+      compass: [10.5, 14.0, "kmpl"], meridian: [9.5, 12.5, "kmpl"],
+      magnite: [13.5, 17.0, "kmpl"], xtrail: [13.0, 16.5, "kmpl"],
+      gurkha: [9.5, 12.0, "kmpl"],
+      atto3: [340, 410, "km"], sealion7: [400, 500, "km"],
+      ex30: [300, 380, "km"], xc40: [330, 410, "km"],
+      x1: [10.0, 14.0, "kmpl"], gla: [10.0, 14.0, "kmpl"], q3: [9.5, 13.5, "kmpl"],
+      defender: [7.0, 10.5, "kmpl"], mux: [9.0, 12.5, "kmpl"], lbunx: [14.0, 18.0, "kmpl"],
+    };
+    CARS.forEach((c) => {
+      const row = REAL_AVG[c.id];
+      if (row) {
+        c.cityAvg = row[0];
+        c.hwyAvg = row[1];
+        c.effUnit = row[2];
+      } else {
+        c.cityAvg = null;
+        c.hwyAvg = null;
+        c.effUnit = /electric/i.test(c.fuel) ? "km" : "kmpl";
+      }
+    });
+
+    // Owner ratings (CarWale-style aggregates) + paraphrased owner themes — confirm live on site.
+    const REVIEWS = {
+      punch: [4.5, 2100, "Compact daily runner; owners like value, some want more power."],
+      nexon: [4.6, 3200, "Feature-rich and safe feel; service wait times come up often."],
+      "nexon-ev": [4.5, 900, "Smooth city EV; real range and charging access decide happiness."],
+      curvv: [4.4, 420, "Coupe looks get praise; rear headroom and ride divide opinions."],
+      "curvv-ev": [4.5, 180, "Quiet EV coupe; owners watch highway range and charger stops."],
+      "sierra-acc": [4.7, 400, "Lounge cabin and diesel pull loved; wait period and size are gripes."],
+      harrier: [4.6, 1100, "Road presence and comfort; thirst and long waits noted."],
+      safari: [4.6, 980, "Family space king; fuel and parking bulk are trade-offs."],
+      brezza: [4.5, 2800, "Reliable Arena buy; cabin feels smaller vs midsize rivals."],
+      fronx: [4.4, 700, "Stylish and efficient; not a soft-roader off-road."],
+      jimny: [4.6, 550, "Go-anywhere fun; highway manners and space are limited."],
+      victoris: [4.6, 120, "Hybrid efficiency praised; still early ownership sample."],
+      vitara: [4.5, 765, "Strong hybrid mileage; some want more punch and rear AC bite."],
+      invicto: [4.5, 210, "Huge cabin, hybrid calm; price and size stretch budgets."],
+      hyryder: [4.4, 353, "Toyota hybrid trust; features trail Creta/Seltos for some."],
+      rumion: [4.4, 480, "Practical MPV value; not an SUV experience."],
+      hycross: [4.6, 640, "Quiet hybrid MPV; premium price, strong family feedback."],
+      fortuner: [4.7, 1900, "Status and durability; thirsty and expensive to run."],
+      xuv3xo: [4.6, 890, "Feature bomb for money; rear space vs rivals debated."],
+      thar: [4.6, 2100, "Lifestyle icon; daily comfort and NVH are compromises."],
+      "thar-roxx": [4.6, 520, "5-door Thar practicality; ride still on the firm side."],
+      "scorpio-n": [4.7, 1230, "Presence and diesel muscle; city thirst and size noted."],
+      xuv700: [4.5, 181, "Screens and ADAS wow; suspension refinement mixed."],
+      be6: [4.6, 260, "EV drama and range; charging network still the caveat."],
+      xev9e: [4.5, 140, "Bigger EV SUV feel; price and charge planning matter."],
+      "bolero-neo": [4.3, 600, "Rugged value workhorse; features are basic."],
+      exter: [4.4, 520, "Easy city SUV; not meant as a midsize upgrade."],
+      venue: [4.5, 1400, "Solid Hyundai compact; rivals feel roomier now."],
+      creta: [4.7, 315, "Segment default for features/comfort; ageing vs fresher rivals."],
+      "creta-ev": [4.5, 90, "Familiar Creta package electrified; early owner sample."],
+      alcazar: [4.5, 410, "6/7-seat Creta formula; fuel and third-row height noted."],
+      tucson: [4.6, 280, "Premium feel and kit; cost of ownership is high."],
+      sonet: [4.4, 156, "Loaded compact; rear space is the usual trade-off."],
+      syros: [4.4, 21, "New Kia compact; still building long-term ownership data."],
+      seltos: [4.7, 164, "Cabin quality and features; fuel economy mid-pack."],
+      carens: [4.5, 380, "Space and flexibility win; SUV looks are polarising."],
+      ev6: [4.6, 95, "Fun EV drive; price and service network stretch budgets."],
+      elevate: [4.5, 720, "Honda reliability first; features lag segment leaders."],
+      astor: [4.4, 340, "ADAS novelty liked; long-term MG service views mixed."],
+      hector: [4.3, 890, "Big cabin and kit; soft dynamics and thirst mentioned."],
+      "hector-plus": [4.3, 210, "More seats for families; same soft-roader character."],
+      "zs-ev": [4.4, 260, "Established MG EV; range and residual value watched."],
+      windsor: [4.5, 180, "Value EV space; looks more MPV than SUV."],
+      kylaq: [4.5, 95, "Fun MQB drive; feature list thinner than Koreans."],
+      kushaq: [4.6, 297, "Best-in-class drive for many; vent seats still missed."],
+      kodiaq: [4.5, 85, "Premium 7-seat space; expensive ownership."],
+      taigun: [4.6, 310, "German-feel drive twin of Kushaq; same feature gaps."],
+      tiguan: [4.5, 70, "Polished C-SUV; price puts it in stretch territory."],
+      kiger: [4.3, 400, "Value subcompact; refinement trails Hyundai/Kia."],
+      duster: [4.4, 60, "New-gen early feedback; check Jaipur stock and waits."],
+      c3: [4.2, 180, "Distinctive and cheap to run; kit is sparse."],
+      "c3-aircross": [4.3, 220, "Flexible seating value; refinement not class-leading."],
+      basalt: [4.3, 110, "Coupe-SUV style on a budget; feature depth limited."],
+      compass: [4.5, 420, "Premium midsize manners; service cost is the watch-out."],
+      meridian: [4.5, 95, "7-seat Jeep capability; steep price and thirst."],
+      magnite: [4.4, 980, "Big cabin for money; NVH and plastics debated."],
+      xtrail: [4.5, 40, "Imported premium hybrid; rare in ownership samples."],
+      gurkha: [4.4, 75, "Hardcore off-road tool; daily comfort is secondary."],
+      atto3: [4.5, 160, "Blade-battery EV trust; software quirks mentioned."],
+      sealion7: [4.5, 35, "Performance EV stretch; early India ownership thin."],
+      ex30: [4.4, 45, "Premium compact EV; price and rear space debated."],
+      xc40: [4.5, 55, "Volvo safety brand pull; ownership cost is high."],
+      x1: [4.5, 120, "BMW drive feel; service bills deter some."],
+      gla: [4.5, 130, "Benz badge and cabin; space vs price questioned."],
+      q3: [4.5, 100, "Audi polish; options and service add up fast."],
+      defender: [4.6, 80, "Iconic capability; running costs are extreme."],
+      mux: [4.4, 50, "Body-on-frame 7-seat work; features trail modern SUVs."],
+      lbunx: [4.5, 25, "Lexus hybrid quiet luxury; rare and pricey."],
+    };
+    CARS.forEach((c) => {
+      const row = REVIEWS[c.id];
+      if (row) {
+        c.reviewRating = row[0];
+        c.reviewCount = row[1];
+        c.reviewQuote = row[2];
+        c.reviewSource = "CarWale owners";
+      } else {
+        c.reviewRating = null;
+        c.reviewCount = 0;
+        c.reviewQuote = "";
+        c.reviewSource = "";
+      }
+    });
+
+    const LUXURY_BRANDS = new Set(["Volvo", "BMW", "Mercedes-Benz", "Audi", "Land Rover", "Lexus"]);
+    const MICRO_IDS = new Set([
+      "punch", "brezza", "fronx", "exter", "venue", "sonet", "syros", "kylaq", "kiger",
+      "c3", "c3-aircross", "basalt", "magnite", "bolero-neo", "windsor", "rumion", "jimny",
+    ]);
+    CARS.forEach((c) => {
+      const blob = (c.fuel + " " + c.variant).toLowerCase();
+      c.isAuto = /at|dct|cvt|dsg|amt|dca|e-cvt|easy-r|automatic/.test(blob) && !/^\s*diesel mt|\bmt\b/.test(blob.replace(/amt|smt/g, ""));
+      // Prefer explicit AT tokens; treat pure MT as manual
+      if (/\bmt\b/.test(blob) && !/amt|smt|at|dct|cvt|dsg|dca/.test(blob)) c.isAuto = false;
+      if (/electric|hybrid/.test(blob) && !/\bmt\b/.test(blob)) c.isAuto = true;
+      const seatBlob = (c.variant + " " + c.note).toLowerCase();
+      c.isSeven = /6\/7|7.seat|7 seat|6.seat|6 seat/.test(seatBlob);
+      c.isLuxury = LUXURY_BRANDS.has(c.brand) || c.price >= 4000000;
+      c.isMidsize = !MICRO_IDS.has(c.id) && c.price >= 1700000;
+    });
+
+    let sortMode = "emi";
+
+    const brandSelect = document.getElementById("brandFilter");
+    brandSelect.innerHTML = '<option value="all" selected>All brands</option>';
+    [...new Set(CARS.map((c) => c.brand))].sort().forEach((b) => {
+      const opt = document.createElement("option");
+      opt.value = b;
+      opt.textContent = b;
+      brandSelect.appendChild(opt);
+    });
+
+    const brandCount = new Set(CARS.map((c) => c.brand)).size;
+    function updateRailFoot(pending, cash, target) {
+      document.querySelector(".rail-foot").innerHTML =
+        `Trade-out: 2022 Nexon EV Max<br />Loan pending ${inr(pending)} · Cash ${inr(cash)}<br />Target EMI ≈ ${inr(target)}<br /><br />${brandCount} brands · ${CARS.length} models`;
+    }
+
+    const TITLES = {
+      overview: ["Overview", "Command center — money, filters, and the lowest-EMI pick."],
+      garage: ["Garage", "Browse and pin cars. Search, sort, and filter live."],
+      compare: ["Compare", "Only fields that differ across your pinned cars."],
+      decide: ["Decide", "Scores, running cost, watchlist, and a copyable buying brief."],
+      plan: ["November plan", "Valuation → test drive → quote → delivery checklist."],
+    };
+
+    const inr = (n) => "₹" + Math.round(Math.abs(n)).toLocaleString("en-IN");
+
+    function getTenure() {
+      return 84;
+    }
+
+    function emi(p, annual, months) {
+      if (p <= 0) return 0;
+      const m = months || getTenure();
+      const r = annual / 12 / 100;
+      return (p * r * Math.pow(1 + r, m)) / (Math.pow(1 + r, m) - 1);
+    }
+
+    function fuelBucket(fuel) {
+      const f = fuel.toLowerCase();
+      if (f.includes("electric")) return "Electric";
+      if (f.includes("hybrid")) return "Hybrid";
+      if (f.includes("diesel")) return "Diesel";
+      return "Petrol";
+    }
+
+    function runCostMonthly(c, usage) {
+      const { kmMonth, cityShare, petrolPrice, dieselPrice, elecPrice } = usage;
+      if (!c.cityAvg || !Number.isFinite(c.cityAvg)) return null;
+      const city = Math.max(0, Math.min(100, cityShare)) / 100;
+      if (c.effUnit === "km") {
+        // EV: assume ~6.5 km/kWh home charging
+        const kmPerKwh = 6.5;
+        return (kmMonth / kmPerKwh) * elecPrice;
+      }
+      const blend = c.cityAvg * city + (c.hwyAvg || c.cityAvg) * (1 - city);
+      if (!blend || blend <= 0) return null;
+      const bucket = fuelBucket(c.fuel);
+      const price = bucket === "Diesel" ? dieselPrice : petrolPrice;
+      return (kmMonth / blend) * price;
+    }
+
+    function featureScore(c) {
+      const bits = [c.ventilated, c.wirelessCarplay, c.rearBlinds, c.powerSeat, c.sunroof, c.adas];
+      return bits.filter(Boolean).length / bits.length;
+    }
+
+    function decisionScore(c, target, minRun, maxRun) {
+      let score = 0;
+      // EMI fit 35
+      if (c.monthly <= target) score += 35 * Math.max(0.55, 1 - (target - c.monthly) / Math.max(target, 1) * 0.35);
+      else {
+        const over = (c.monthly - target) / Math.max(target, 1);
+        score += Math.max(0, 35 * (1 - over / 0.45));
+      }
+      // Safety 20
+      score += c.ncapStars != null ? (c.ncapStars / 5) * 20 : 6;
+      // Features 20
+      score += featureScore(c) * 20;
+      // Owners 15
+      score += c.reviewRating != null ? (c.reviewRating / 5) * 15 : 5;
+      // Run cost 10 (lower better)
+      if (c.runCost != null && maxRun > minRun) {
+        score += 10 * (1 - (c.runCost - minRun) / (maxRun - minRun));
+      } else if (c.runCost != null) {
+        score += 7;
+      } else {
+        score += 4;
+      }
+      return Math.round(Math.max(0, Math.min(100, score)) * 10) / 10;
+    }
+
+    function ncapLabel(c) {
+      if (c.ncapStars == null) return "NR";
+      return c.ncapStars + "★ " + c.ncapBody;
+    }
+
+    function effLabel(n, unit) {
+      if (n == null || !Number.isFinite(n)) return "—";
+      const v = Number.isInteger(n) ? n : Math.round(n * 10) / 10;
+      return unit === "km" ? v + " km" : v + " kmpl";
+    }
+
+    function reviewHtml(c) {
+      if (c.reviewRating == null) {
+        return `<div class="review"><div class="review-top"><strong>—</strong><small>No owner sample yet</small></div></div>`;
+      }
+      const count = c.reviewCount >= 1000
+        ? (Math.round(c.reviewCount / 100) / 10) + "k"
+        : String(c.reviewCount);
+      return `<div class="review">
+        <div class="review-top">
+          <strong>${c.reviewRating.toFixed(1)} ★</strong>
+          <small>${count} owner ratings</small>
+        </div>
+        <p>“${c.reviewQuote}”</p>
+        <div class="rev-src">${c.reviewSource} · themes paraphrased</div>
+      </div>`;
+    }
+
+    // Best pick among filtered cars: lowest EMI (filters already applied).
+    function choosePick(list) {
+      if (!list.length) return null;
+      return [...list].sort((a, b) => a.monthly - b.monthly || a.price - b.price)[0];
+    }
+
+    function pickReason(pick, ctx) {
+      const active = [
+        ctx.emiOnly && ("EMI ≤ " + inr(ctx.target)),
+        ctx.emiSoft && "EMI ≤ +15%",
+        ctx.maxPrice > 0 && ("max " + inr(ctx.maxPrice)),
+        ctx.noLuxury && "no luxury",
+        ctx.midsizeOnly && "midsize+",
+        ctx.autoOnly && "automatic",
+        ctx.sevenOnly && "6/7 seat",
+        ctx.fuel !== "all" && ctx.fuel,
+        ctx.ventOnly && "ventilated",
+        ctx.carplayOnly && "wireless",
+        ctx.blindOnly && "blinds",
+        ctx.powerSeatOnly && "power seat",
+        ctx.sunroofOnly && "sunroof",
+        ctx.adasOnly && "ADAS",
+        ctx.ncapMin > 0 && ("NCAP ≥ " + ctx.ncapMin + "★"),
+        ctx.reviewMin > 0 && ("Owners ≥ " + ctx.reviewMin.toFixed(1) + "★"),
+        ctx.brand !== "all" && ctx.brand,
+      ].filter(Boolean);
+      const filterBit = active.length
+        ? `Lowest EMI among cars that pass your filters (${active.join(", ")}).`
+        : "Lowest EMI across the full garage (no filters on).";
+      const vs =
+        pick.monthly <= ctx.target
+          ? ` Saves ${inr(ctx.target - pick.monthly)}/mo vs target.`
+          : ` +${inr(pick.delta)}/mo vs target.`;
+      const owners = pick.reviewRating != null
+        ? ` Owners ${pick.reviewRating.toFixed(1)}★ (${pick.reviewCount}+).`
+        : "";
+      return filterBit + vs + ` NCAP ${ncapLabel(pick)}.` + owners;
+    }
+
+    function getList() {
+      const saleRaw = +document.getElementById("sale").value;
+      const rateRaw = +document.getElementById("rate").value;
+      const pendingRaw = +document.getElementById("pending").value;
+      const cashRaw = +document.getElementById("cash").value;
+      const targetRaw = +document.getElementById("targetEmi").value;
+      const sale = Number.isFinite(saleRaw) && saleRaw > 0 ? saleRaw : 900000;
+      const rate = Number.isFinite(rateRaw) && rateRaw > 0 ? rateRaw : 8.75;
+      const pending = Number.isFinite(pendingRaw) && pendingRaw >= 0 ? pendingRaw : PENDING_DEFAULT;
+      const cash = Number.isFinite(cashRaw) && cashRaw >= 0 ? cashRaw : CASH_DEFAULT;
+      const target = Number.isFinite(targetRaw) && targetRaw > 0 ? targetRaw : TARGET_DEFAULT;
+      const brand = document.getElementById("brandFilter").value;
+      const fuel = document.getElementById("fuelFilter").value;
+      const q = (document.getElementById("garageSearch")?.value || "").trim().toLowerCase();
+      const maxPriceRaw = +document.getElementById("maxPrice").value;
+      const maxPrice = Number.isFinite(maxPriceRaw) && maxPriceRaw > 0 ? maxPriceRaw : 0;
+      const ventOnly = document.getElementById("ventFilter").checked;
+      const carplayOnly = document.getElementById("carplayFilter").checked;
+      const blindOnly = document.getElementById("blindFilter").checked;
+      const powerSeatOnly = document.getElementById("powerSeatFilter").checked;
+      const emiOnly = document.getElementById("emiFilter").checked;
+      const emiSoft = document.getElementById("emiSoftFilter").checked;
+      const noLuxury = document.getElementById("noLuxuryFilter").checked;
+      const midsizeOnly = document.getElementById("midsizeFilter").checked;
+      const autoOnly = document.getElementById("autoFilter").checked;
+      const sevenOnly = document.getElementById("sevenFilter").checked;
+      const sunroofOnly = document.getElementById("sunroofFilter").checked;
+      const adasOnly = document.getElementById("adasFilter").checked;
+      const ncapMinRaw = +document.getElementById("ncapMin").value;
+      const ncapMin = Number.isFinite(ncapMinRaw) ? Math.max(0, Math.min(5, ncapMinRaw)) : 0;
+      const reviewMinRaw = +document.getElementById("reviewMin").value;
+      const reviewMin = Number.isFinite(reviewMinRaw) ? Math.max(0, Math.min(5, reviewMinRaw)) : 0;
+      const tenure = getTenure();
+      const kmMonthRaw = +document.getElementById("kmMonth").value;
+      const cityShareRaw = +document.getElementById("cityShare").value;
+      const petrolRaw = +document.getElementById("petrolPrice").value;
+      const dieselRaw = +document.getElementById("dieselPrice").value;
+      const elecRaw = +document.getElementById("elecPrice").value;
+      const usage = {
+        kmMonth: Number.isFinite(kmMonthRaw) && kmMonthRaw > 0 ? kmMonthRaw : 1200,
+        cityShare: Number.isFinite(cityShareRaw) ? Math.max(0, Math.min(100, cityShareRaw)) : 70,
+        petrolPrice: Number.isFinite(petrolRaw) && petrolRaw > 0 ? petrolRaw : 102,
+        dieselPrice: Number.isFinite(dieselRaw) && dieselRaw > 0 ? dieselRaw : 90,
+        elecPrice: Number.isFinite(elecRaw) && elecRaw > 0 ? elecRaw : 8,
+      };
+      const equity = sale - pending;
+      const down = equity + cash;
+
+      let list = CARS.map((c) => {
+        const loan = Math.max(0, c.price - down);
+        const monthly = emi(loan, rate, tenure);
+        const runCost = runCostMonthly(c, usage);
+        return {
+          ...c,
+          loan,
+          monthly,
+          runCost,
+          totalMonthly: monthly + (runCost || 0),
+          delta: monthly - target,
+          pick: false,
+          bucket: fuelBucket(c.fuel),
+        };
+      });
+
+      if (brand !== "all") list = list.filter((c) => c.brand === brand);
+      if (fuel !== "all") list = list.filter((c) => c.bucket === fuel);
+      if (maxPrice > 0) list = list.filter((c) => c.price <= maxPrice);
+      if (emiOnly) list = list.filter((c) => c.monthly <= target);
+      if (emiSoft) list = list.filter((c) => c.monthly <= target * 1.15);
+      if (noLuxury) list = list.filter((c) => !c.isLuxury);
+      if (midsizeOnly) list = list.filter((c) => c.isMidsize);
+      if (autoOnly) list = list.filter((c) => c.isAuto);
+      if (sevenOnly) list = list.filter((c) => c.isSeven);
+      if (ventOnly) list = list.filter((c) => c.ventilated);
+      if (carplayOnly) list = list.filter((c) => c.wirelessCarplay);
+      if (blindOnly) list = list.filter((c) => c.rearBlinds);
+      if (powerSeatOnly) list = list.filter((c) => c.powerSeat);
+      if (sunroofOnly) list = list.filter((c) => c.sunroof);
+      if (adasOnly) list = list.filter((c) => c.adas);
+      if (ncapMin > 0) list = list.filter((c) => c.ncapStars != null && c.ncapStars >= ncapMin);
+      if (reviewMin > 0) list = list.filter((c) => c.reviewRating != null && c.reviewRating >= reviewMin);
+      if (q) {
+        list = list.filter((c) =>
+          [c.brand, c.name, c.short, c.variant, c.fuel, c.note].join(" ").toLowerCase().includes(q)
+        );
+      }
+
+      const runs = list.map((c) => c.runCost).filter((n) => n != null);
+      const minRun = runs.length ? Math.min(...runs) : 0;
+      const maxRun = runs.length ? Math.max(...runs) : 1;
+      list.forEach((c) => {
+        c.score = decisionScore(c, target, minRun, maxRun);
+      });
+
+      const pick = choosePick(list);
+      if (pick) pick.pick = true;
+
+      if (sortMode === "emi") list.sort((a, b) => a.monthly - b.monthly);
+      if (sortMode === "run") list.sort((a, b) => (a.totalMonthly || 0) - (b.totalMonthly || 0));
+      if (sortMode === "score") list.sort((a, b) => b.score - a.score || a.monthly - b.monthly);
+      if (sortMode === "price") list.sort((a, b) => a.price - b.price);
+      if (sortMode === "delta") list.sort((a, b) => Math.abs(a.delta) - Math.abs(b.delta));
+      if (sortMode === "ncap") {
+        list.sort((a, b) => {
+          const na = a.ncapStars == null ? -1 : a.ncapStars;
+          const nb = b.ncapStars == null ? -1 : b.ncapStars;
+          return nb - na || a.monthly - b.monthly;
+        });
+      }
+      if (sortMode === "review") {
+        list.sort((a, b) => {
+          const ra = a.reviewRating == null ? -1 : a.reviewRating;
+          const rb = b.reviewRating == null ? -1 : b.reviewRating;
+          return rb - ra || (b.reviewCount || 0) - (a.reviewCount || 0) || a.monthly - b.monthly;
+        });
+      }
+      if (sortMode === "brand") list.sort((a, b) => a.brand.localeCompare(b.brand) || a.monthly - b.monthly);
+
+      return {
+        list, pick, sale, rate, pending, cash, equity, down, brand, fuel, target, q, maxPrice,
+        ventOnly, carplayOnly, blindOnly, powerSeatOnly, emiOnly, emiSoft, noLuxury, midsizeOnly,
+        autoOnly, sevenOnly, sunroofOnly, adasOnly, ncapMin, reviewMin, tenure, usage,
+      };
+    }
+
+    function saveCompare() {
+      try { localStorage.setItem(COMPARE_KEY, JSON.stringify(compareIds)); } catch (_) {}
+    }
+
+    function saveWatch() {
+      try { localStorage.setItem(WATCH_KEY, JSON.stringify(watchIds)); } catch (_) {}
+    }
+
+    function toggleCompare(id) {
+      if (compareIds.includes(id)) {
+        compareIds = compareIds.filter((x) => x !== id);
+      } else if (compareIds.length < 3) {
+        compareIds = [...compareIds, id];
+      } else {
+        compareIds = [...compareIds.slice(1), id];
+      }
+      saveCompare();
+      render();
+    }
+
+    function toggleWatch(id) {
+      if (watchIds.includes(id)) {
+        watchIds = watchIds.filter((x) => x !== id);
+      } else if (watchIds.length < 5) {
+        watchIds = [...watchIds, id];
+      } else {
+        watchIds = [...watchIds.slice(1), id];
+      }
+      saveWatch();
+      render();
+    }
+
+    function showToast(msg) {
+      let el = document.getElementById("toast");
+      if (!el) {
+        el = document.createElement("div");
+        el.id = "toast";
+        el.className = "toast";
+        document.body.appendChild(el);
+      }
+      el.textContent = msg;
+      el.classList.add("show");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => el.classList.remove("show"), 1800);
+    }
+
+    function buildBrief(ctx) {
+      const { list, pick, sale, rate, pending, cash, down, target, tenure, usage } = ctx;
+      const topScore = [...list].sort((a, b) => b.score - a.score).slice(0, 3);
+      const watched = watchIds.map((id) => list.find((c) => c.id === id) || CARS.find((c) => c.id === id)).filter(Boolean);
+      const lines = [
+        "Jaipur SUV buying brief",
+        "—".repeat(28),
+        `EV Max sale ~ ${inr(sale)} · pending loan ${inr(pending)} · cash ${inr(cash)}`,
+        `Down payment ${inr(down)} · rate ${rate}% · tenure ${tenure} mo · EMI target ${inr(target)}`,
+        `Usage ${usage.kmMonth} km/mo · ${usage.cityShare}% city`,
+        "",
+        pick
+          ? `Lowest-EMI pick: ${pick.name} (${pick.variant}) — EMI ${inr(pick.monthly)} · score ${pick.score} · fuel/power ~ ${pick.runCost != null ? inr(pick.runCost) : "—"}/mo`
+          : "Lowest-EMI pick: none in current filters",
+        "",
+        "Top decision scores:",
+        ...topScore.map((c, i) => `  ${i + 1}. ${c.short} — ${c.score} pts · EMI ${inr(c.monthly)} · run ${c.runCost != null ? inr(c.runCost) : "—"}`),
+        "",
+        watched.length
+          ? "Watchlist:\n" + watched.map((c) => `  • ${c.name} · ${inr(c.price || 0)} on-road`).join("\n")
+          : "Watchlist: empty",
+        "",
+        "Next: foreclosure letter · 3 sale quotes · Sierra Acc + hybrid TD · sealed on-road.",
+      ];
+      return lines.join("\n");
+    }
+
+    function goPanel(id) {
+      if (!TITLES[id] || !document.getElementById("panel-" + id)) id = "overview";
+      document.querySelectorAll("#nav button").forEach((b) => b.classList.toggle("active", b.dataset.panel === id));
+      document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
+      document.getElementById("panel-" + id).classList.add("active");
+      document.getElementById("pageTitle").textContent = TITLES[id][0];
+      document.getElementById("pageSub").textContent = TITLES[id][1];
+    }
+
+    function daysToNovember() {
+      const now = new Date();
+      const target = new Date(now.getFullYear(), 10, 15);
+      if (now > target) target.setFullYear(target.getFullYear() + 1);
+      return Math.max(0, Math.ceil((target - now) / 86400000));
+    }
+
+    function barRows(rows, maxEmi) {
+      return rows
+        .map((r) => {
+          const pct = Math.max(4, Math.round((r.monthly / maxEmi) * 100));
+          const cls = r.pick ? "gold" : r.delta > 8000 ? "hot" : "";
+          return `<div class="row">
+            <span>${r.short}</span>
+            <div class="track"><div class="fill ${cls}" style="width:${pct}%"></div></div>
+            <em style="font-style:normal;font-variant-numeric:tabular-nums">${inr(r.monthly)}</em>
+          </div>`;
+        })
+        .join("");
+    }
+
+    function render() {
+      const ctx = getList();
+      const { list, pick, sale, rate, pending, cash, equity, down, target, tenure, usage } = ctx;
+      const near = [...list].sort((a, b) => Math.abs(a.delta) - Math.abs(b.delta)).slice(0, 6);
+      const maxEmi = Math.max(...list.map((r) => r.monthly), target, 1);
+      const under = list.filter((c) => c.monthly <= target).length;
+      const fiveStar = list.filter((c) => c.ncapStars != null && c.ncapStars >= 5).length;
+      const brandsIn = new Set(list.map((c) => c.brand)).size;
+
+      updateRailFoot(pending, cash, target);
+
+      document.getElementById("statusBar").innerHTML = `
+        <div><small>Market</small><strong>Jaipur</strong><em>On-road mid–high trim</em></div>
+        <div><small>Delivery window</small><strong>${daysToNovember()} days</strong><em>Target ~15 Nov</em></div>
+        <div><small>Shortlist</small><strong>${list.length} / ${CARS.length}</strong><em>${brandsIn} brands in view</em></div>
+        <div><small>Under target</small><strong>${under}</strong><em>EMI ≤ ${inr(target)}</em></div>
+        <div><small>Watchlist</small><strong>${watchIds.length} / 5</strong><em>Compare ${compareIds.length}/3</em></div>
+      `;
+
+      document.getElementById("topPills").innerHTML = `
+        <span class="pill">Down ${inr(down)}</span>
+        <span class="pill">${tenure} mo · ${rate}%</span>
+        <span class="pill">Target ${inr(target)}</span>
+        ${pick ? `<span class="pill em">Pick ${pick.short} · ${inr(pick.monthly)}</span>` : ""}
+      `;
+
+      document.getElementById("kpi").innerHTML = `
+        <div><b>${inr(sale)}</b><span>EV Max sale estimate</span></div>
+        <div><b>${inr(equity)}</b><span>Equity after ${inr(pending)} loan</span></div>
+        <div><b>${inr(down)}</b><span>Total down (equity + ${inr(cash)})</span></div>
+        <div><b>${pick ? inr(pick.monthly) : "—"}</b><span>${pick ? pick.short + " EMI" : "No match"}</span></div>
+      `;
+
+      const underPct = list.length ? Math.round((under / list.length) * 100) : 0;
+      const starPct = list.length ? Math.round((fiveStar / list.length) * 100) : 0;
+      const reviewed = list.filter((c) => c.reviewRating != null);
+      const bestReview = reviewed.length
+        ? [...reviewed].sort((a, b) => b.reviewRating - a.reviewRating || b.reviewCount - a.reviewCount)[0]
+        : null;
+      const bestScore = list.length ? [...list].sort((a, b) => b.score - a.score)[0] : null;
+      document.getElementById("insights").innerHTML = `
+        <div class="insight">
+          <b>${under}</b><span>Under EMI target</span>
+          <div class="spark"><i style="width:${underPct}%"></i></div>
+        </div>
+        <div class="insight">
+          <b>${fiveStar}</b><span>NCAP 5★ in view</span>
+          <div class="spark"><i style="width:${starPct}%"></i></div>
+        </div>
+        <div class="insight">
+          <b>${bestScore ? bestScore.score : "—"}</b>
+          <span>${bestScore ? "Best score · " + bestScore.short : "Best decision score"}</span>
+          <div class="spark"><i style="width:${bestScore ? Math.round(bestScore.score) : 0}%"></i></div>
+        </div>
+        <div class="insight">
+          <b>${bestReview ? bestReview.reviewRating.toFixed(1) : "—"}</b>
+          <span>${bestReview ? "Best owners · " + bestReview.short : "Best owner rating"}</span>
+          <div class="spark"><i style="width:${bestReview ? Math.round((bestReview.reviewRating / 5) * 100) : 0}%"></i></div>
+        </div>
+      `;
+
+      const avgEl = document.getElementById("liveAvg");
+      if (list.length) {
+        const avg = (key) => list.reduce((s, c) => s + c[key], 0) / list.length;
+        const avgPrice = avg("price");
+        const avgEmi = avg("monthly");
+        const avgDelta = avg("delta");
+        const emiSorted = [...list].map((c) => c.monthly).sort((a, b) => a - b);
+        const mid = Math.floor(emiSorted.length / 2);
+        const medianEmi = emiSorted.length % 2
+          ? emiSorted[mid]
+          : (emiSorted[mid - 1] + emiSorted[mid]) / 2;
+        const deltaCls = avgDelta <= 500 ? "ok" : avgDelta > 8000 ? "bad" : "warn";
+        const deltaLabel = avgDelta <= 0
+          ? `Saves ${inr(Math.abs(avgDelta))}`
+          : `+${inr(avgDelta)}`;
+        avgEl.innerHTML = `
+          <div><b>${inr(avgPrice)}</b><span>Avg on-road · ${list.length} cars</span></div>
+          <div><b>${inr(avgEmi)}</b><span>Avg EMI @ ${rate}%</span></div>
+          <div><b>${inr(medianEmi)}</b><span>Median EMI</span></div>
+          <div><b class="delta ${deltaCls}">${deltaLabel}</b><span>Avg vs target / mo</span></div>
+        `;
+      } else {
+        avgEl.innerHTML = `
+          <div><b>—</b><span>Avg on-road</span></div>
+          <div><b>—</b><span>Avg EMI</span></div>
+          <div><b>—</b><span>Median EMI</span></div>
+          <div><b>—</b><span>Avg vs target</span></div>
+        `;
+      }
+
+      document.getElementById("recBox").innerHTML = pick
+        ? `<h2>Recommended pick</h2>
+           <p><strong>${pick.name}</strong> — ${pick.variant}. ${pick.note}</p>
+           <p class="muted" style="margin:10px 0 0">${pickReason(pick, ctx)}</p>
+           <div class="rec-meta">
+             <div><small>On-road Jaipur</small><strong>${inr(pick.price)}</strong></div>
+             <div><small>EMI @ ${rate}%</small><strong>${inr(pick.monthly)}</strong></div>
+             <div><small>vs target</small><strong>${pick.delta <= 0 ? "Saves " + inr(Math.abs(pick.delta)) : "+" + inr(pick.delta)}</strong></div>
+           </div>
+           ${reviewHtml(pick)}
+           <div class="quick-links">
+             <button type="button" data-go="garage">Open garage</button>
+             <button type="button" data-go="compare">Compare pins</button>
+             <button type="button" data-go="decide">Decide</button>
+           </div>`
+        : `<h2>No cars match</h2><p>Relax a filter or switch brand to All.</p>`;
+
+      document.querySelectorAll("#recBox [data-go]").forEach((btn) => {
+        btn.addEventListener("click", () => goPanel(btn.dataset.go));
+      });
+
+      document.getElementById("budgetList").innerHTML = `
+        <li><span>EV sale</span><span class="pos">${inr(sale)}</span></li>
+        <li><span>Clear old loan</span><span class="neg">−${inr(pending)}</span></li>
+        <li><span>Your cash</span><span class="pos">+${inr(cash)}</span></li>
+        <li><span>Down payment</span><span>${inr(down)}</span></li>
+        <li><span>Pick on-road</span><span>${pick ? inr(pick.price) : "—"}</span></li>
+        <li><span>New loan</span><span>${pick ? inr(pick.loan) : "—"}</span></li>
+      `;
+
+      document.getElementById("nearBars").innerHTML = list.length
+        ? barRows(near, maxEmi)
+        : '<p class="muted">No cars in filter.</p>';
+
+      const mix = {};
+      list.forEach((c) => { mix[c.bucket] = (mix[c.bucket] || 0) + 1; });
+      document.getElementById("fuelMix").innerHTML = Object.keys(mix).length
+        ? Object.entries(mix).map(([k, v]) => `<span>${k}: ${v}</span>`).join("")
+        : "<span>None</span>";
+
+      const brandCounts = {};
+      list.forEach((c) => { brandCounts[c.brand] = (brandCounts[c.brand] || 0) + 1; });
+      const topBrands = Object.entries(brandCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+      const maxBrand = topBrands.length ? topBrands[0][1] : 1;
+      document.getElementById("brandBars").innerHTML = topBrands.length
+        ? topBrands.map(([b, n]) => {
+            const pct = Math.max(6, Math.round((n / maxBrand) * 100));
+            return `<div class="row"><span>${b}</span><div class="track"><div class="fill" style="width:${pct}%"></div></div><em style="font-style:normal">${n}</em></div>`;
+          }).join("")
+        : '<p class="muted">No brands in filter.</p>';
+
+      const filtersOn = [
+        ctx.brand !== "all" && ctx.brand,
+        ctx.fuel !== "all" && ctx.fuel,
+        ctx.q && ("search: " + ctx.q),
+        ctx.emiOnly && ("EMI ≤ " + inr(target)),
+        ctx.emiSoft && "EMI ≤ +15%",
+        ctx.maxPrice > 0 && ("max " + inr(ctx.maxPrice)),
+        ctx.noLuxury && "no luxury",
+        ctx.midsizeOnly && "midsize+",
+        ctx.autoOnly && "automatic",
+        ctx.sevenOnly && "6/7 seat",
+        ctx.ventOnly && "ventilated",
+        ctx.carplayOnly && "wireless",
+        ctx.blindOnly && "blinds",
+        ctx.powerSeatOnly && "power seat",
+        ctx.sunroofOnly && "sunroof",
+        ctx.adasOnly && "ADAS",
+        ctx.ncapMin > 0 && ("NCAP ≥ " + ctx.ncapMin + "★"),
+        ctx.reviewMin > 0 && ("Owners ≥ " + ctx.reviewMin.toFixed(1) + "★"),
+      ].filter(Boolean);
+      document.getElementById("filterSummary").textContent = filtersOn.length
+        ? "Active filters: " + filtersOn.join(" · ")
+        : "No feature filters — full garage visible.";
+
+      const mustCount = document.getElementById("mustMatchCount");
+      const mustHint = document.getElementById("mustMatchHint");
+      const mustBar = document.getElementById("mustMatchBar");
+      if (mustCount) mustCount.textContent = String(list.length);
+      if (mustHint) {
+        mustHint.textContent = filtersOn.length
+          ? `of ${CARS.length} · ${filtersOn.length} active`
+          : `of ${CARS.length} · no filters`;
+      }
+      if (mustBar) {
+        mustBar.style.width = Math.round((list.length / Math.max(CARS.length, 1)) * 100) + "%";
+      }
+
+      updateFilterChrome(ctx, filtersOn);
+
+      // Garage
+      const avgEmiGarage = list.length
+        ? list.reduce((s, c) => s + c.monthly, 0) / list.length
+        : 0;
+      document.getElementById("garageCount").textContent = list.length
+        ? `${list.length} cars · avg EMI ${inr(avgEmiGarage)} · sort: ${sortMode}`
+        : `0 cars · sort: ${sortMode}`;
+      document.getElementById("cars").innerHTML = list.length
+        ? list.map((r) => {
+            const cls = r.delta <= 500 ? "ok" : r.delta > 8000 ? "bad" : "warn";
+            const deltaLabel = r.delta <= 0 ? `Saves ${inr(Math.abs(r.delta))}/mo` : `+${inr(r.delta)}/mo`;
+            const pinned = compareIds.includes(r.id);
+            const watched = watchIds.includes(r.id);
+            return `<article class="car ${r.pick ? "pick" : ""}">
+              ${r.pick ? '<div class="badge">Pick</div>' : ""}
+              <div class="brand-chip">${r.brand}</div>
+              <h3>${r.name}</h3>
+              <p class="variant">${r.variant}</p>
+              <div>
+                <span class="tag ${r.ventilated ? "" : "off"}">${r.ventilated ? "Ventilated" : "No vent"}</span>
+                <span class="tag ${r.wirelessCarplay ? "" : "off"}">${r.wirelessCarplay ? "Wireless AA/CP" : "No wireless"}</span>
+                <span class="tag ${r.rearBlinds ? "" : "off"}">${r.rearBlinds ? "Rear blinds" : "No blinds"}</span>
+                <span class="tag ${r.powerSeat ? "" : "off"}">${r.powerSeat ? "Power seat" : "Manual seat"}</span>
+                <span class="tag ${r.sunroof ? "" : "off"}">${r.sunroof ? "Sunroof" : "No sunroof"}</span>
+                <span class="tag ${r.adas ? "" : "off"}">${r.adas ? "ADAS L2" : "No ADAS"}</span>
+                <span class="tag ${r.ncapStars != null && r.ncapStars >= 5 ? "" : "off"}">${ncapLabel(r)}</span>
+              </div>
+              <div class="meta">
+                <div><small>On-road</small><strong>${inr(r.price)}</strong></div>
+                <div><small>Loan</small><strong>${inr(r.loan)}</strong></div>
+                <div><small>EMI @ ${rate}%</small><strong>${inr(r.monthly)}</strong></div>
+                <div><small>vs target</small><strong class="delta ${cls}">${deltaLabel}</strong></div>
+                <div><small>Powertrain</small><strong>${r.fuel}</strong></div>
+                <div><small>NCAP</small><strong>${ncapLabel(r)}</strong></div>
+                <div><small>Real city avg</small><strong>${effLabel(r.cityAvg, r.effUnit)}</strong></div>
+                <div><small>Real hwy avg</small><strong>${effLabel(r.hwyAvg, r.effUnit)}</strong></div>
+                <div><small>Owner rating</small><strong>${r.reviewRating != null ? r.reviewRating.toFixed(1) + " ★" : "—"}</strong></div>
+                <div><small>Score</small><strong>${r.score != null ? r.score : "—"}</strong></div>
+                <div><small>Fuel/power / mo</small><strong>${r.runCost != null ? inr(r.runCost) : "—"}</strong></div>
+                <div><small>EMI + run</small><strong>${inr(r.totalMonthly || r.monthly)}</strong></div>
+              </div>
+              <p class="note">${r.note}</p>
+              ${reviewHtml(r)}
+              <div class="card-actions">
+                <button type="button" class="${pinned ? "on-cmp" : ""}" data-cmp="${r.id}">${pinned ? "Pinned" : "Compare"}</button>
+                <button type="button" class="${watched ? "on-cmp" : ""}" data-watch="${r.id}">${watched ? "Watching" : "Watch"}</button>
+              </div>
+            </article>`;
+          }).join("")
+        : '<p class="empty">No cars match the selected filters.</p>';
+
+      document.querySelectorAll("#cars [data-cmp]").forEach((btn) => {
+        btn.addEventListener("click", () => toggleCompare(btn.dataset.cmp));
+      });
+      document.querySelectorAll("#cars [data-watch]").forEach((btn) => {
+        btn.addEventListener("click", () => toggleWatch(btn.dataset.watch));
+      });
+
+      // Compare — only fields that differ across pinned cars
+      const byId = Object.fromEntries(CARS.map((c) => [c.id, c]));
+      const cmpCars = compareIds.map((id) => {
+        const fromList = list.find((c) => c.id === id);
+        if (fromList) return { ...fromList };
+        const base = byId[id];
+        if (!base) return null;
+        const loan = Math.max(0, base.price - down);
+        const monthly = emi(loan, rate, tenure);
+        const runCost = runCostMonthly(base, usage);
+        return { ...base, loan, monthly, runCost, totalMonthly: monthly + (runCost || 0), delta: monthly - target, bucket: fuelBucket(base.fuel), score: null };
+      }).filter(Boolean);
+
+      const cmpFields = [
+        { key: "price", label: "On-road", val: (c) => inr(c.price), raw: (c) => Math.round(c.price), kind: "spec" },
+        { key: "emi", label: "EMI @ " + rate + "%", val: (c) => inr(c.monthly), raw: (c) => Math.round(c.monthly), kind: "spec" },
+        { key: "delta", label: "vs target", val: (c) => (c.delta <= 0 ? "−" + inr(Math.abs(c.delta)) : "+" + inr(c.delta)), raw: (c) => Math.round(c.delta), kind: "spec" },
+        { key: "loan", label: "Loan", val: (c) => inr(c.loan), raw: (c) => Math.round(c.loan), kind: "spec" },
+        { key: "fuel", label: "Powertrain", val: (c) => c.fuel, raw: (c) => c.fuel, kind: "spec" },
+        { key: "ncap", label: "NCAP", val: (c) => ncapLabel(c), raw: (c) => ncapLabel(c), kind: "spec" },
+        { key: "city", label: "Real city avg", val: (c) => effLabel(c.cityAvg, c.effUnit), raw: (c) => String(c.cityAvg) + c.effUnit, kind: "spec" },
+        { key: "hwy", label: "Real hwy avg", val: (c) => effLabel(c.hwyAvg, c.effUnit), raw: (c) => String(c.hwyAvg) + c.effUnit, kind: "spec" },
+        { key: "owners", label: "Owner rating", val: (c) => (c.reviewRating != null ? c.reviewRating.toFixed(1) + " ★" : "—"), raw: (c) => c.reviewRating, kind: "spec" },
+        { key: "score", label: "Decision score", val: (c) => (c.score != null ? c.score : "—"), raw: (c) => c.score, kind: "spec" },
+        { key: "run", label: "Fuel/power / mo", val: (c) => (c.runCost != null ? inr(c.runCost) : "—"), raw: (c) => Math.round(c.runCost || 0), kind: "spec" },
+        { key: "totalMo", label: "EMI + run", val: (c) => inr(c.totalMonthly || c.monthly), raw: (c) => Math.round(c.totalMonthly || c.monthly), kind: "spec" },
+        { key: "revCount", label: "Owner ratings #", val: (c) => (c.reviewCount ? c.reviewCount.toLocaleString("en-IN") : "—"), raw: (c) => c.reviewCount || 0, kind: "spec" },
+        { key: "vent", label: "Ventilated seats", val: (c) => (c.ventilated ? "Yes" : "No"), raw: (c) => !!c.ventilated, kind: "feature" },
+        { key: "wireless", label: "Wireless AA/CP", val: (c) => (c.wirelessCarplay ? "Yes" : "No"), raw: (c) => !!c.wirelessCarplay, kind: "feature" },
+        { key: "blinds", label: "Rear blinds", val: (c) => (c.rearBlinds ? "Yes" : "No"), raw: (c) => !!c.rearBlinds, kind: "feature" },
+        { key: "power", label: "Powered seat", val: (c) => (c.powerSeat ? "Yes" : "No"), raw: (c) => !!c.powerSeat, kind: "feature" },
+        { key: "sunroof", label: "Sunroof", val: (c) => (c.sunroof ? "Yes" : "No"), raw: (c) => !!c.sunroof, kind: "feature" },
+        { key: "adas", label: "ADAS L2", val: (c) => (c.adas ? "Yes" : "No"), raw: (c) => !!c.adas, kind: "feature" },
+      ];
+
+      let showFields = cmpFields;
+      if (cmpCars.length >= 2) {
+        // Specs + features: only differing rows. Feature tags always on the card.
+        showFields = cmpFields.filter((f) => {
+          const vals = cmpCars.map((c) => f.raw(c));
+          return vals.some((v) => v !== vals[0]);
+        });
+      }
+
+      const specDiffs = showFields.filter((f) => f.kind === "spec").length;
+      const featDiffs = showFields.filter((f) => f.kind === "feature").length;
+      const hint = document.getElementById("compareHint");
+      if (hint) {
+        if (cmpCars.length < 2) {
+          hint.textContent = "Pin 2–3 cars from Garage. Cards show features; list only diffs.";
+        } else {
+          hint.textContent = `${specDiffs} spec diff${specDiffs === 1 ? "" : "s"} · ${featDiffs} feature diff${featDiffs === 1 ? "" : "s"} · feature tags always on.`;
+        }
+      }
+
+      const slots = [0, 1, 2].map((i) => cmpCars[i] || null);
+      document.getElementById("compareGrid").innerHTML = slots.map((r) => {
+        if (!r) {
+          return `<div class="compare-slot"><p class="empty-slot">Pin a car from Garage<br />(up to 3)</p></div>`;
+        }
+        const featureTags = `
+          <div style="margin-top:10px">
+            <span class="tag ${r.ventilated ? "" : "off"}">${r.ventilated ? "Ventilated" : "No vent"}</span>
+            <span class="tag ${r.wirelessCarplay ? "" : "off"}">${r.wirelessCarplay ? "Wireless AA/CP" : "No wireless"}</span>
+            <span class="tag ${r.rearBlinds ? "" : "off"}">${r.rearBlinds ? "Rear blinds" : "No blinds"}</span>
+            <span class="tag ${r.powerSeat ? "" : "off"}">${r.powerSeat ? "Power seat" : "Manual seat"}</span>
+            <span class="tag ${r.sunroof ? "" : "off"}">${r.sunroof ? "Sunroof" : "No sunroof"}</span>
+            <span class="tag ${r.adas ? "" : "off"}">${r.adas ? "ADAS L2" : "No ADAS"}</span>
+          </div>`;
+        const rowsHtml = cmpCars.length < 2
+          ? `<p class="muted" style="margin-top:12px">Add another pin to list differing specs &amp; features.</p>`
+          : showFields.length
+            ? `<div class="cmp-rows">${showFields.map((f) =>
+                `<div><span>${f.label}</span><strong>${f.val(r)}</strong></div>`
+              ).join("")}</div>`
+            : `<p class="muted" style="margin-top:12px">No differences vs other pins.</p>`;
+        return `<div class="compare-slot filled">
+          <div class="brand-chip">${r.brand}</div>
+          <h3>${r.name}</h3>
+          <p class="variant">${r.variant}</p>
+          ${featureTags}
+          ${reviewHtml(r)}
+          ${rowsHtml}
+          <div class="card-actions">
+            <button type="button" data-unpin="${r.id}">Remove</button>
+          </div>
+        </div>`;
+      }).join("");
+      document.querySelectorAll("#compareGrid [data-unpin]").forEach((btn) => {
+        btn.addEventListener("click", () => toggleCompare(btn.dataset.unpin));
+      });
+
+      // Decide panel
+      const scored = [...list].sort((a, b) => b.score - a.score || a.monthly - b.monthly).slice(0, 8);
+      document.getElementById("scoreBoard").innerHTML = scored.length
+        ? scored.map((c, i) => `
+            <div class="score-row">
+              <div class="rank">${i + 1}</div>
+              <div>
+                <strong>${c.short}</strong>
+                <div class="muted" style="font-size:0.78rem">${c.brand} · EMI ${inr(c.monthly)} · run ${c.runCost != null ? inr(c.runCost) : "—"}</div>
+                <div class="score-bar"><i style="width:${Math.round(c.score)}%"></i></div>
+              </div>
+              <strong class="score-num">${c.score}</strong>
+            </div>`).join("")
+        : '<p class="muted">No cars in filter.</p>';
+
+      const byRun = [...list].sort((a, b) => (a.totalMonthly || 0) - (b.totalMonthly || 0)).slice(0, 10);
+      const maxRunTotal = Math.max(...byRun.map((c) => c.totalMonthly || 0), 1);
+      document.getElementById("runBars").innerHTML = byRun.length
+        ? byRun.map((r) => {
+            const pct = Math.max(4, Math.round(((r.totalMonthly || 0) / maxRunTotal) * 100));
+            return `<div class="row">
+              <span>${r.short}</span>
+              <div class="track"><div class="fill ${r.pick ? "gold" : ""}" style="width:${pct}%"></div></div>
+              <em style="font-style:normal;font-variant-numeric:tabular-nums">${inr(r.totalMonthly || 0)}</em>
+            </div>`;
+          }).join("")
+        : '<p class="muted">No cars.</p>';
+
+      const watchCars = watchIds.map((id) => list.find((c) => c.id === id) || (() => {
+        const base = byId[id];
+        if (!base) return null;
+        const loan = Math.max(0, base.price - down);
+        const monthly = emi(loan, rate, tenure);
+        const runCost = runCostMonthly(base, usage);
+        return { ...base, loan, monthly, runCost, totalMonthly: monthly + (runCost || 0) };
+      })()).filter(Boolean);
+      document.getElementById("watchList").innerHTML = watchCars.length
+        ? watchCars.map((c) => `
+            <div class="watch-item">
+              <div>
+                <strong>${c.name}</strong>
+                <div class="muted" style="font-size:0.8rem">${c.variant}</div>
+                <div style="margin-top:6px;font-size:0.84rem;font-weight:700">EMI ${inr(c.monthly)} · run ${c.runCost != null ? inr(c.runCost) : "—"} · ${inr(c.price)}</div>
+              </div>
+              <div class="watch-actions">
+                <button type="button" data-cmp="${c.id}">Compare</button>
+                <button type="button" data-unwatch="${c.id}">Remove</button>
+              </div>
+            </div>`).join("")
+        : '<p class="muted">No cars watched yet — use Watch on Garage cards.</p>';
+      document.querySelectorAll("#watchList [data-cmp]").forEach((btn) => {
+        btn.addEventListener("click", () => toggleCompare(btn.dataset.cmp));
+      });
+      document.querySelectorAll("#watchList [data-unwatch]").forEach((btn) => {
+        btn.addEventListener("click", () => toggleWatch(btn.dataset.unwatch));
+      });
+
+      document.getElementById("briefPreview").textContent = buildBrief(ctx);
+    }
+
+    // Nav
+    document.querySelectorAll("#nav button").forEach((btn) => {
+      btn.addEventListener("click", () => goPanel(btn.dataset.panel));
+    });
+
+    document.getElementById("clearCompare").addEventListener("click", () => {
+      compareIds = [];
+      saveCompare();
+      render();
+    });
+
+    // Checklist persistence
+    document.querySelectorAll("#checklist input").forEach((box) => {
+      const key = "suv-check-" + box.dataset.k;
+      box.checked = localStorage.getItem(key) === "1";
+      box.addEventListener("change", () => {
+        localStorage.setItem(key, box.checked ? "1" : "0");
+      });
+    });
+
+    const PREFS_KEY = "suv-compare-prefs-v4";
+    const NUMBER_IDS = [
+      "sale", "pending", "cash", "rate", "targetEmi", "maxPrice", "ncapMin", "reviewMin",
+      "tenure", "kmMonth", "cityShare", "petrolPrice", "dieselPrice", "elecPrice",
+    ];
+    const MUST_IDS = [
+      "emiFilter", "emiSoftFilter", "noLuxuryFilter", "midsizeFilter",
+      "autoFilter", "sevenFilter",
+      "ventFilter", "carplayFilter", "blindFilter", "powerSeatFilter", "sunroofFilter",
+      "adasFilter",
+    ];
+    const FEATURE_IDS = [
+      "ventFilter", "carplayFilter", "blindFilter", "powerSeatFilter", "sunroofFilter",
+      "adasFilter",
+    ];
+    const FILTER_IDS = ["brandFilter", "fuelFilter", ...MUST_IDS];
+
+    function ncapLabelText(v) {
+      return v <= 0 ? "Off" : "≥ " + v + "★";
+    }
+
+    function reviewLabelText(v) {
+      return v <= 0 ? "Off" : "≥ " + Number(v).toFixed(1) + "★";
+    }
+
+    function syncNcapLabel() {
+      const el = document.getElementById("ncapMin");
+      const lab = document.getElementById("ncapSliderLabel");
+      const v = +el?.value || 0;
+      if (lab) lab.textContent = ncapLabelText(v);
+      document.querySelectorAll("#ncapStars i").forEach((dot, i) => {
+        dot.classList.toggle("on", i < v);
+      });
+    }
+
+    function syncReviewLabel() {
+      const el = document.getElementById("reviewMin");
+      const lab = document.getElementById("reviewSliderLabel");
+      const v = +el?.value || 0;
+      if (lab) lab.textContent = reviewLabelText(v);
+    }
+
+    function syncFuelSeg() {
+      const fuel = document.getElementById("fuelFilter").value;
+      document.querySelectorAll("#fuelSeg button").forEach((b) => {
+        b.classList.toggle("on", b.dataset.fuel === fuel);
+      });
+    }
+
+    function syncPriceChips() {
+      const v = +document.getElementById("maxPrice").value || 0;
+      const lab = document.getElementById("maxPriceLabel");
+      const custom = document.getElementById("maxPrice");
+      const known = [0, 2000000, 2500000, 3000000, 3500000];
+      const isKnown = known.includes(v);
+      if (lab) lab.textContent = v <= 0 ? "No cap" : inr(v);
+      custom.style.display = isKnown ? "none" : "block";
+      document.querySelectorAll("#priceChips button").forEach((b) => {
+        if (b.dataset.price === "custom") {
+          b.classList.toggle("on", !isKnown && v > 0);
+        } else {
+          b.classList.toggle("on", +b.dataset.price === v);
+        }
+      });
+    }
+
+    function updateFilterChrome(ctx, filtersOn) {
+      syncFuelSeg();
+      syncPriceChips();
+      syncNcapLabel();
+      syncReviewLabel();
+
+      const u = ctx.usage || {};
+      const usageChanged = [
+        u.kmMonth !== 1200,
+        u.cityShare !== 70,
+        u.petrolPrice !== 102,
+        u.dieselPrice !== 90,
+        u.elecPrice !== 8,
+      ].filter(Boolean).length;
+      const groups = {
+        budget: [
+          ctx.emiOnly, ctx.emiSoft, ctx.noLuxury, ctx.midsizeOnly, ctx.maxPrice > 0,
+        ].filter(Boolean).length,
+        usage: usageChanged,
+        power: [
+          ctx.fuel !== "all", ctx.autoOnly, ctx.sevenOnly,
+        ].filter(Boolean).length,
+        cabin: [
+          ctx.ventOnly, ctx.carplayOnly, ctx.blindOnly, ctx.powerSeatOnly, ctx.sunroofOnly,
+        ].filter(Boolean).length,
+        safety: [
+          ctx.adasOnly, ctx.ncapMin > 0, ctx.reviewMin > 0,
+        ].filter(Boolean).length,
+        brand: ctx.brand !== "all" ? 1 : 0,
+      };
+      Object.entries(groups).forEach(([k, n]) => {
+        const el = document.querySelector(`[data-acc-count="${k}"]`);
+        if (!el) return;
+        el.textContent = String(n);
+        el.classList.toggle("on", n > 0);
+      });
+
+      const chipDefs = [
+        { show: ctx.emiOnly, label: "EMI ≤ target", clear: () => { document.getElementById("emiFilter").checked = false; } },
+        { show: ctx.emiSoft, label: "EMI ≤ +15%", clear: () => { document.getElementById("emiSoftFilter").checked = false; } },
+        { show: ctx.noLuxury, label: "No luxury", clear: () => { document.getElementById("noLuxuryFilter").checked = false; } },
+        { show: ctx.midsizeOnly, label: "Midsize+", clear: () => { document.getElementById("midsizeFilter").checked = false; } },
+        { show: ctx.maxPrice > 0, label: "Max " + inr(ctx.maxPrice), clear: () => { document.getElementById("maxPrice").value = "0"; syncPriceChips(); } },
+        { show: ctx.fuel !== "all", label: ctx.fuel, clear: () => { document.getElementById("fuelFilter").value = "all"; syncFuelSeg(); } },
+        { show: ctx.autoOnly, label: "Automatic", clear: () => { document.getElementById("autoFilter").checked = false; } },
+        { show: ctx.sevenOnly, label: "6/7 seater", clear: () => { document.getElementById("sevenFilter").checked = false; } },
+        { show: ctx.ventOnly, label: "Ventilated", clear: () => { document.getElementById("ventFilter").checked = false; } },
+        { show: ctx.carplayOnly, label: "Wireless", clear: () => { document.getElementById("carplayFilter").checked = false; } },
+        { show: ctx.blindOnly, label: "Blinds", clear: () => { document.getElementById("blindFilter").checked = false; } },
+        { show: ctx.powerSeatOnly, label: "Power seat", clear: () => { document.getElementById("powerSeatFilter").checked = false; } },
+        { show: ctx.sunroofOnly, label: "Sunroof", clear: () => { document.getElementById("sunroofFilter").checked = false; } },
+        { show: ctx.adasOnly, label: "ADAS L2", clear: () => { document.getElementById("adasFilter").checked = false; } },
+        { show: ctx.ncapMin > 0, label: "NCAP ≥ " + ctx.ncapMin + "★", clear: () => { document.getElementById("ncapMin").value = "0"; syncNcapLabel(); } },
+        { show: ctx.reviewMin > 0, label: "Owners ≥ " + ctx.reviewMin.toFixed(1) + "★", clear: () => { document.getElementById("reviewMin").value = "0"; syncReviewLabel(); } },
+        { show: ctx.brand !== "all", label: ctx.brand, clear: () => { document.getElementById("brandFilter").value = "all"; } },
+        { show: !!ctx.q, label: "Search", clear: () => { document.getElementById("garageSearch").value = ""; } },
+      ];
+
+      const wrap = document.getElementById("activeChips");
+      if (!wrap) return;
+      const active = chipDefs.filter((c) => c.show);
+      wrap.innerHTML = active.map((c, i) =>
+        `<span class="active-chip">${c.label}<button type="button" data-chip="${i}" aria-label="Remove">×</button></span>`
+      ).join("");
+      wrap.querySelectorAll("[data-chip]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          active[+btn.dataset.chip].clear();
+          persistAndRender();
+        });
+      });
+    }
+
+    function savePrefs() {
+      const prefs = {
+        sortMode,
+        numbers: {},
+        checks: {},
+        accordions: {},
+        brand: document.getElementById("brandFilter").value,
+        fuel: document.getElementById("fuelFilter").value,
+        search: document.getElementById("garageSearch").value,
+      };
+      NUMBER_IDS.forEach((id) => {
+        prefs.numbers[id] = document.getElementById(id).value;
+      });
+      MUST_IDS.forEach((id) => {
+        prefs.checks[id] = document.getElementById(id).checked;
+      });
+      document.querySelectorAll("#mustBlock details.filter-acc[data-acc]").forEach((el) => {
+        prefs.accordions[el.dataset.acc] = el.open;
+      });
+      try {
+        localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
+      } catch (_) { /* ignore */ }
+    }
+
+    function loadPrefs() {
+      let prefs = null;
+      try {
+        prefs = JSON.parse(
+          localStorage.getItem(PREFS_KEY) ||
+          localStorage.getItem("suv-compare-prefs-v3") ||
+          localStorage.getItem("suv-compare-prefs-v2") ||
+          localStorage.getItem("suv-compare-prefs-v1") ||
+          "null"
+        );
+      } catch (_) {
+        prefs = null;
+      }
+      if (!prefs || typeof prefs !== "object") return;
+
+      if (prefs.numbers && typeof prefs.numbers === "object") {
+        NUMBER_IDS.forEach((id) => {
+          const v = prefs.numbers[id];
+          if (v != null && v !== "" && document.getElementById(id)) {
+            document.getElementById(id).value = v;
+          }
+        });
+      }
+      // Migrate old NCAP checkboxes → slider
+      if (prefs.checks) {
+        if (prefs.checks.ncapFilter && (prefs.numbers?.ncapMin == null || prefs.numbers?.ncapMin === "" || prefs.numbers?.ncapMin === "0")) {
+          document.getElementById("ncapMin").value = "5";
+        } else if (prefs.checks.ncapRatedFilter && (prefs.numbers?.ncapMin == null || prefs.numbers?.ncapMin === "" || prefs.numbers?.ncapMin === "0")) {
+          document.getElementById("ncapMin").value = "1";
+        }
+      }
+      if (prefs.checks && typeof prefs.checks === "object") {
+        MUST_IDS.forEach((id) => {
+          if (typeof prefs.checks[id] === "boolean" && document.getElementById(id)) {
+            document.getElementById(id).checked = prefs.checks[id];
+          }
+        });
+      }
+      if (prefs.brand) {
+        const brandEl = document.getElementById("brandFilter");
+        if ([...brandEl.options].some((o) => o.value === prefs.brand)) brandEl.value = prefs.brand;
+      }
+      if (prefs.fuel) {
+        const fuelEl = document.getElementById("fuelFilter");
+        if ([...fuelEl.options].some((o) => o.value === prefs.fuel)) fuelEl.value = prefs.fuel;
+      }
+      if (typeof prefs.search === "string") {
+        document.getElementById("garageSearch").value = prefs.search;
+      }
+      if (prefs.sortMode && ["emi", "run", "score", "price", "delta", "ncap", "review", "brand"].includes(prefs.sortMode)) {
+        sortMode = prefs.sortMode;
+        document.querySelectorAll("#sortBtns button").forEach((b) => {
+          b.classList.toggle("on", b.dataset.sort === sortMode);
+        });
+      }
+      if (prefs.accordions && typeof prefs.accordions === "object") {
+        document.querySelectorAll("#mustBlock details.filter-acc[data-acc]").forEach((el) => {
+          const key = el.dataset.acc;
+          if (typeof prefs.accordions[key] === "boolean") {
+            el.open = prefs.accordions[key];
+          }
+        });
+      }
+      syncNcapLabel();
+      syncReviewLabel();
+    }
+
+    function persistAndRender() {
+      savePrefs();
+      render();
+    }
+
+    loadPrefs();
+    syncNcapLabel();
+    syncReviewLabel();
+    syncFuelSeg();
+    syncPriceChips();
+
+    document.querySelectorAll("#mustBlock details.filter-acc[data-acc]").forEach((el) => {
+      el.addEventListener("toggle", () => {
+        savePrefs();
+      });
+    });
+    NUMBER_IDS.forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener("input", () => { persistAndRender(); });
+      el.addEventListener("change", () => { persistAndRender(); });
+    });
+    FILTER_IDS.forEach((id) => {
+      document.getElementById(id).addEventListener("change", () => { persistAndRender(); });
+    });
+    document.getElementById("garageSearch").addEventListener("input", persistAndRender);
+
+    document.getElementById("clearWatch").addEventListener("click", () => {
+      watchIds = [];
+      saveWatch();
+      render();
+    });
+    document.getElementById("watchToCompare").addEventListener("click", () => {
+      compareIds = watchIds.slice(0, 3);
+      saveCompare();
+      render();
+      goPanel("compare");
+      showToast("Pinned watchlist to compare");
+    });
+    document.getElementById("copyBrief").addEventListener("click", async () => {
+      const text = document.getElementById("briefPreview").textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast("Brief copied");
+      } catch (_) {
+        showToast("Copy failed — select text manually");
+      }
+    });
+    document.getElementById("printDecide").addEventListener("click", () => {
+      goPanel("decide");
+      window.print();
+    });
+
+    document.getElementById("mustAll").addEventListener("click", () => {
+      FEATURE_IDS.forEach((id) => { document.getElementById(id).checked = true; });
+      persistAndRender();
+    });
+    document.getElementById("mustClear").addEventListener("click", () => {
+      MUST_IDS.forEach((id) => { document.getElementById(id).checked = false; });
+      document.getElementById("fuelFilter").value = "all";
+      document.getElementById("brandFilter").value = "all";
+      document.getElementById("maxPrice").value = "0";
+      document.getElementById("ncapMin").value = "0";
+      document.getElementById("reviewMin").value = "0";
+      syncNcapLabel();
+      syncReviewLabel();
+      syncFuelSeg();
+      syncPriceChips();
+      persistAndRender();
+    });
+
+    document.getElementById("ncapMin").addEventListener("input", () => {
+      syncNcapLabel();
+      persistAndRender();
+    });
+
+    document.getElementById("reviewMin").addEventListener("input", () => {
+      syncReviewLabel();
+      persistAndRender();
+    });
+
+    document.querySelectorAll("#fuelSeg button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.getElementById("fuelFilter").value = btn.dataset.fuel;
+        syncFuelSeg();
+        persistAndRender();
+      });
+    });
+
+    document.querySelectorAll("#priceChips button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const custom = document.getElementById("maxPrice");
+        if (btn.dataset.price === "custom") {
+          if (+custom.value === 0) custom.value = "2800000";
+          custom.style.display = "block";
+          custom.focus();
+        } else {
+          custom.value = btn.dataset.price;
+          custom.style.display = "none";
+        }
+        syncPriceChips();
+        persistAndRender();
+      });
+    });
+
+    document.getElementById("mustGoGarage").addEventListener("click", () => goPanel("garage"));
+
+    document.querySelectorAll("#sortBtns button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        sortMode = btn.dataset.sort;
+        document.querySelectorAll("#sortBtns button").forEach((b) => b.classList.remove("on"));
+        btn.classList.add("on");
+        persistAndRender();
+      });
+    });
+
+    render();
+  </script>
+</body>
+</html>
