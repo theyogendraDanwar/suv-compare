@@ -1,0 +1,41 @@
+name: Refresh car catalog
+
+on:
+  schedule:
+    # Every 5 days around 04:00 UTC (~09:30 IST)
+    - cron: "0 4 */5 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-car-catalog
+  cancel-in-progress: true
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Fetch latest companies & SUV/MPV models
+        run: python3 scripts/refresh_catalog.py
+
+      - name: Commit & push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/cars.json data/companies.json data/catalog.js
+          if git diff --staged --quiet; then
+            echo "No catalog changes."
+            exit 0
+          fi
+          git commit -m "chore: refresh car & company catalog"
+          git push

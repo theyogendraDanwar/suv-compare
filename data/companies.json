@@ -1,0 +1,191 @@
+{
+  "updatedAt": "2026-09-21T18:25:51Z",
+  "source": "carwale+curated",
+  "companies": [
+    {
+      "name": "Aston Martin",
+      "slug": "aston-martin-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Audi",
+      "slug": "audi-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "BMW",
+      "slug": "bmw-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "BYD",
+      "slug": "byd-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Bentley",
+      "slug": "bentley-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Citroen",
+      "slug": "citroen-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Ferrari",
+      "slug": "ferrari-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Force",
+      "slug": "force-motors-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Honda",
+      "slug": "honda-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Hyundai",
+      "slug": "hyundai-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Isuzu",
+      "slug": "isuzu-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Jaguar",
+      "slug": "jaguar-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Jeep",
+      "slug": "jeep-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Jsw",
+      "slug": "jsw-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Kia",
+      "slug": "kia-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Lamborghini",
+      "slug": "lamborghini-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Land Rover",
+      "slug": "land-rover-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Lexus",
+      "slug": "lexus-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Lotus",
+      "slug": "lotus-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "MG",
+      "slug": "mg-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Mahindra",
+      "slug": "mahindra-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Maruti",
+      "slug": "maruti-suzuki-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Maserati",
+      "slug": "maserati-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Mclaren",
+      "slug": "mclaren-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Mercedes-Benz",
+      "slug": "mercedes-benz-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Mini",
+      "slug": "mini-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Nissan",
+      "slug": "nissan-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Porsche",
+      "slug": "porsche-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Renault",
+      "slug": "renault-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Rolls Royce",
+      "slug": "rolls-royce-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Skoda",
+      "slug": "skoda-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Tata",
+      "slug": "tata-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Tesla",
+      "slug": "tesla-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Toyota",
+      "slug": "toyota-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Vinfast",
+      "slug": "vinfast-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Volkswagen",
+      "slug": "volkswagen-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Volvo",
+      "slug": "volvo-cars",
+      "source": "carwale"
+    }
+  ]
+}
