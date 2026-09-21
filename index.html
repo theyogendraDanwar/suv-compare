@@ -1043,7 +1043,8 @@
       gap: 0;
       scroll-padding-inline: 0;
     }
-    .carousel.overview-cards > .overview-card {
+    .carousel.overview-cards > .overview-card,
+    .carousel.panel-cards > .overview-card {
       flex: 0 0 100%;
       width: 100%;
       max-width: 100%;
@@ -1502,7 +1503,8 @@
       .carousel.status-bar > *,
       .carousel.kpi > *,
       .carousel.insight-grid > .insight {
-        flex: 0 0 min(82vw, 280px);
+        flex: 0 0 calc(100vw - 48px);
+        max-width: 320px;
         padding: 14px 16px;
       }
       .status-bar,
@@ -1783,8 +1785,15 @@
 
     @media (max-width: 640px) {
       .mobile-bar { top: 0; }
-      .topbar { top: 52px; }
-      .toolbar { top: 108px; }
+      .topbar {
+        top: 52px;
+        position: relative;
+        background: transparent;
+        margin-bottom: 8px;
+        padding-bottom: 8px;
+      }
+      .topbar p { display: none; }
+      .toolbar { position: relative; top: auto; }
       .car .meta { grid-template-columns: 1fr 1fr; }
       .kpi b { font-size: 1.2rem; }
       .bottom-nav button {
@@ -1800,23 +1809,35 @@
       .brand-bars > div .track {
         order: 3;
       }
+      .status-bar,
+      .kpi,
+      .insight-grid,
+      .avg-grid {
+        scroll-snap-type: x mandatory;
+      }
       .status-bar > div,
       .kpi > div,
       .insight,
       .carousel.status-bar > *,
       .carousel.kpi > *,
-      .carousel.insight-grid > .insight {
-        flex-basis: min(84vw, 300px);
+      .carousel.insight-grid > .insight,
+      .avg-grid > div {
+        flex: 0 0 calc(100% - 4px);
+        max-width: none;
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
       }
       .carousel.garage-carousel > .car {
-        flex-basis: calc(100vw - 40px);
+        flex: 0 0 calc(100vw - 32px);
       }
-      .carousel.overview-cards > .overview-card {
-        flex-basis: calc(100vw - 24px);
+      .carousel.overview-cards > .overview-card,
+      .carousel.panel-cards > .overview-card {
+        flex: 0 0 calc(100vw - 24px);
         width: calc(100vw - 24px);
       }
       .rec-box .rec-meta { grid-template-columns: 1fr; }
       .tools-actions { grid-template-columns: 1fr; }
+      .main { padding-left: 10px; padding-right: 10px; }
     }
 
     .seg-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
@@ -2249,69 +2270,77 @@
 
       <!-- DECIDE -->
       <section class="panel" id="panel-decide">
-        <div class="split" style="margin-bottom:16px">
-          <div class="panel-box">
-            <h2>Decision scoreboard</h2>
-            <p class="muted" style="margin-bottom:12px">Weighted: EMI fit 35 · safety 20 · features 20 · owners 15 · run cost 10.</p>
-            <div class="score-list" id="scoreBoard"></div>
-          </div>
-          <div class="panel-box">
-            <h2>Monthly run cost</h2>
-            <p class="muted" style="margin-bottom:12px">EMI + estimated fuel/power from your km mix. Top of current filter.</p>
-            <div class="stack-rows" id="runBars"></div>
-          </div>
-        </div>
-        <div class="split">
-          <div class="panel-box">
-            <h2>Watchlist</h2>
-            <p class="muted" style="margin-bottom:12px">Save up to 5 contenders from Garage. Local only.</p>
-            <div class="watch-list" id="watchList"></div>
-            <div class="tools-actions">
-              <button type="button" id="clearWatch">Clear watchlist</button>
-              <button type="button" id="watchToCompare">Pin top 3 to compare</button>
+        <div class="carousel-wrap" id="decideCardsWrap">
+          <button type="button" class="carousel-btn prev" data-carousel="decideCards" aria-label="Previous">‹</button>
+          <div class="carousel overview-cards panel-cards" id="decideCards">
+            <div class="overview-card panel-box">
+              <h2>Decision scoreboard</h2>
+              <p class="muted" style="margin-bottom:12px">Weighted: EMI fit 35 · safety 20 · features 20 · owners 15 · run cost 10.</p>
+              <div class="score-list" id="scoreBoard"></div>
+            </div>
+            <div class="overview-card panel-box">
+              <h2>Monthly run cost</h2>
+              <p class="muted" style="margin-bottom:12px">EMI + estimated fuel/power from your km mix.</p>
+              <div class="stack-rows" id="runBars"></div>
+            </div>
+            <div class="overview-card panel-box">
+              <h2>Watchlist</h2>
+              <p class="muted" style="margin-bottom:12px">Save up to 5 contenders from Garage.</p>
+              <div class="watch-list" id="watchList"></div>
+              <div class="tools-actions">
+                <button type="button" id="clearWatch">Clear watchlist</button>
+                <button type="button" id="watchToCompare">Pin top 3 to compare</button>
+              </div>
+            </div>
+            <div class="overview-card panel-box">
+              <h2>Buying brief</h2>
+              <p class="muted" style="margin-bottom:12px">Copy for family / bank / dealer WhatsApp.</p>
+              <pre id="briefPreview" style="white-space:pre-wrap;font:inherit;font-size:0.86rem;background:var(--sand);border:1px solid var(--line);padding:14px;max-height:280px;overflow:auto"></pre>
+              <div class="tools-actions">
+                <button type="button" id="copyBrief">Copy brief</button>
+                <button type="button" id="printDecide">Print / PDF</button>
+              </div>
             </div>
           </div>
-          <div class="panel-box">
-            <h2>Buying brief</h2>
-            <p class="muted" style="margin-bottom:12px">Copy a text summary for family / bank / dealer WhatsApp.</p>
-            <pre id="briefPreview" style="white-space:pre-wrap;font:inherit;font-size:0.86rem;background:var(--sand);border:1px solid var(--line);padding:14px;max-height:280px;overflow:auto"></pre>
-            <div class="tools-actions">
-              <button type="button" id="copyBrief">Copy brief</button>
-              <button type="button" id="printDecide">Print / PDF</button>
-            </div>
-          </div>
+          <button type="button" class="carousel-btn next" data-carousel="decideCards" aria-label="Next">›</button>
+          <div class="carousel-dots" id="decideDots" aria-hidden="true"></div>
         </div>
       </section>
 
       <!-- PLAN -->
       <section class="panel" id="panel-plan">
         <div class="plan-meta" id="planMeta"></div>
-        <div class="split">
-          <div class="panel-box">
-            <h2 id="planPathTitle">Buy path</h2>
-            <div class="timeline" id="buyTimeline"></div>
-          </div>
-          <div class="panel-box">
-            <h2>Dealer checklist</h2>
-            <p class="muted" id="planCheckHint" style="margin-bottom:8px">Ticks save on this device.</p>
-            <div class="checklist" id="checklist">
-              <label><input type="checkbox" data-k="v1" /> 3 EV Max sale quotes in writing</label>
-              <label><input type="checkbox" data-k="v2" /> Foreclosure / NOC letter from bank</label>
-              <label><input type="checkbox" data-k="v3" /> <span id="checkTdLabel">Lead pick test drive</span></label>
-              <label><input type="checkbox" data-k="v4" /> Backup / hybrid test drive</label>
-              <label><input type="checkbox" data-k="v5" /> Sealed Jaipur on-road quote</label>
-              <label><input type="checkbox" data-k="v6" /> Loan sanction letter @ agreed rate</label>
-              <label><input type="checkbox" data-k="v7" /> Confirm ventilated seats + rear blinds on VIN</label>
+        <div class="carousel-wrap" id="planCardsWrap">
+          <button type="button" class="carousel-btn prev" data-carousel="planCards" aria-label="Previous">‹</button>
+          <div class="carousel overview-cards panel-cards" id="planCards">
+            <div class="overview-card panel-box">
+              <h2 id="planPathTitle">Buy path</h2>
+              <div class="timeline" id="buyTimeline"></div>
+            </div>
+            <div class="overview-card panel-box">
+              <h2>Dealer checklist</h2>
+              <p class="muted" id="planCheckHint" style="margin-bottom:8px">Ticks save on this device.</p>
+              <div class="checklist" id="checklist">
+                <label><input type="checkbox" data-k="v1" /> 3 EV Max sale quotes in writing</label>
+                <label><input type="checkbox" data-k="v2" /> Foreclosure / NOC letter from bank</label>
+                <label><input type="checkbox" data-k="v3" /> <span id="checkTdLabel">Lead pick test drive</span></label>
+                <label><input type="checkbox" data-k="v4" /> Backup / hybrid test drive</label>
+                <label><input type="checkbox" data-k="v5" /> Sealed Jaipur on-road quote</label>
+                <label><input type="checkbox" data-k="v6" /> Loan sanction letter @ agreed rate</label>
+                <label><input type="checkbox" data-k="v7" /> Confirm ventilated seats + rear blinds on VIN</label>
+              </div>
             </div>
           </div>
+          <button type="button" class="carousel-btn next" data-carousel="planCards" aria-label="Next">›</button>
+          <div class="carousel-dots" id="planDots" aria-hidden="true"></div>
         </div>
       </section>
     </main>
   </div>
 
   <nav class="bottom-nav" id="bottomNav" aria-label="Sections">
-    <button type="button" data-panel="overview" class="active">Overview</button>
-    <button type="button" data-panel="garage">Garage</button>
+    <button type="button" data-panel="overview" class="active">Home</button>
+    <button type="button" data-panel="garage">Cars</button>
     <button type="button" data-panel="compare">Compare</button>
     <button type="button" data-panel="decide">Decide</button>
     <button type="button" data-panel="plan" id="bottomPlan">Plan</button>
@@ -3578,6 +3607,8 @@
 
     function syncOverviewCards() {
       syncCarouselDots("overviewCards", "overviewDots", ":scope > .overview-card");
+      syncCarouselDots("decideCards", "decideDots", ":scope > .overview-card");
+      syncCarouselDots("planCards", "planDots", ":scope > .overview-card");
     }
 
     // Nav
