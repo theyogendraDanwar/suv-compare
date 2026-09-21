@@ -107,7 +107,8 @@
       margin-bottom: 12px;
     }
     .rail select,
-    .rail input[type="number"] {
+    .rail input[type="number"],
+    .rail input[type="month"] {
       appearance: none;
       width: 100%;
       background: #243024;
@@ -116,6 +117,10 @@
       padding: 10px 12px;
       font: inherit;
       font-weight: 600;
+    }
+    .rail input[type="month"]::-webkit-calendar-picker-indicator {
+      filter: invert(0.75);
+      cursor: pointer;
     }
     .rail select {
       background: #243024 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath fill='%239aa894' d='M0 0l6 8 6-8z'/%3E%3C/svg%3E") right 12px center / 10px no-repeat;
@@ -126,6 +131,7 @@
       opacity: 0.6;
     }
     .rail input[type="number"]:focus,
+    .rail input[type="month"]:focus,
     .rail select:focus {
       outline: 1px solid #c9a978;
       border-color: #c9a978;
@@ -1220,7 +1226,7 @@
     <aside class="rail">
       <div class="rail-brand">
         Garage
-        <span>Jaipur · Nov move</span>
+        <span id="railBrandSub">Jaipur · Nov move</span>
       </div>
 
       <nav class="nav" id="nav">
@@ -1228,7 +1234,7 @@
         <button type="button" data-panel="garage">Garage</button>
         <button type="button" data-panel="compare">Compare</button>
         <button type="button" data-panel="decide">Decide</button>
-        <button type="button" data-panel="plan">November plan</button>
+        <button type="button" data-panel="plan" id="navPlan">November plan</button>
       </nav>
 
       <div class="rail-block">
@@ -1258,6 +1264,11 @@
           <input type="number" id="targetEmi" min="5000" max="100000" step="500" value="24000" />
         </label>
         <p class="field-hint">Your comfort ceiling for the new loan</p>
+        <label>
+          When planning to buy
+          <input type="month" id="buyMonth" value="2026-11" />
+        </label>
+        <p class="field-hint">Delivery target — drives countdown &amp; plan</p>
         <input type="hidden" id="tenure" value="84" />
       </div>
 
@@ -1304,10 +1315,6 @@
             <label>
               Km / month
               <input type="number" id="kmMonth" min="200" max="5000" step="50" value="1200" />
-            </label>
-            <label>
-              City driving %
-              <input type="number" id="cityShare" min="0" max="100" step="5" value="70" />
             </label>
             <label>
               Petrol ₹/L
@@ -1429,7 +1436,7 @@
       <header class="topbar">
         <div>
           <h1 id="pageTitle">Overview</h1>
-          <p id="pageSub">Your buying cockpit for a November delivery in Jaipur.</p>
+          <p id="pageSub">Your buying cockpit for a November 2026 delivery in Jaipur.</p>
         </div>
         <div class="pill-row" id="topPills"></div>
       </header>
@@ -1545,37 +1552,8 @@
       <section class="panel" id="panel-plan">
         <div class="split">
           <div class="panel-box">
-            <h2>November path</h2>
-            <div class="timeline">
-              <div class="tl-item">
-                <div class="tl-dot"></div>
-                <div>
-                  <h3>Now → mid October</h3>
-                  <p>Bank foreclosure letter for exact EV payoff date. Get 3 valuations (Tata exchange, CARS24, Spinny Jaipur).</p>
-                </div>
-              </div>
-              <div class="tl-item">
-                <div class="tl-dot"></div>
-                <div>
-                  <h3>Late October</h3>
-                  <p>Test Sierra Accomplished Diesel AT + one hybrid (Victoris / Hyryder) + Creta/Seltos if you want a second opinion.</p>
-                </div>
-              </div>
-              <div class="tl-item">
-                <div class="tl-dot"></div>
-                <div>
-                  <h3>Early November</h3>
-                  <p>Lock sealed on-road quote. Loan = on-road − (sale equity + your cash). Prefer putting max down to protect EMI.</p>
-                </div>
-              </div>
-              <div class="tl-item">
-                <div class="tl-dot"></div>
-                <div>
-                  <h3>Delivery week</h3>
-                  <p>Clear EV loan same day as sale/exchange. Transfer RC. Activate insurance & FASTag on new car.</p>
-                </div>
-              </div>
-            </div>
+            <h2 id="planPathTitle">November path</h2>
+            <div class="timeline" id="buyTimeline"></div>
           </div>
           <div class="panel-box">
             <h2>Dealer checklist</h2>
@@ -1956,6 +1934,108 @@
       plan: ["November plan", "Valuation → test drive → quote → delivery checklist."],
     };
 
+    const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const MONTH_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+    function parseBuyMonth() {
+      const raw = (document.getElementById("buyMonth")?.value || "").trim();
+      const m = /^(\d{4})-(\d{2})$/.exec(raw);
+      if (!m) return defaultBuyDate();
+      const year = +m[1];
+      const month = +m[2] - 1;
+      if (!Number.isFinite(year) || month < 0 || month > 11) return defaultBuyDate();
+      return new Date(year, month, 15);
+    }
+
+    function defaultBuyDate() {
+      const now = new Date();
+      let year = now.getFullYear();
+      if (now > new Date(year, 10, 15)) year += 1;
+      return new Date(year, 10, 15);
+    }
+
+    function buyMonthLabel(long) {
+      const d = parseBuyMonth();
+      const name = long ? MONTH_NAMES[d.getMonth()] : MONTH_SHORT[d.getMonth()];
+      return name + " " + d.getFullYear();
+    }
+
+    function buyMonthShort() {
+      return MONTH_SHORT[parseBuyMonth().getMonth()];
+    }
+
+    function daysToBuy() {
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      const target = parseBuyMonth();
+      target.setHours(0, 0, 0, 0);
+      return Math.max(0, Math.ceil((target - now) / 86400000));
+    }
+
+    function syncBuyTiming() {
+      const label = buyMonthLabel(true);
+      const short = buyMonthShort();
+      const planTitle = label.split(" ")[0] + " plan";
+
+      TITLES.overview[1] = `Your buying cockpit for a ${label} delivery in Jaipur.`;
+      TITLES.plan[0] = planTitle;
+      TITLES.plan[1] = "Valuation → test drive → quote → delivery checklist.";
+
+      const railSub = document.getElementById("railBrandSub");
+      if (railSub) railSub.textContent = `Jaipur · ${short} move`;
+
+      const navPlan = document.getElementById("navPlan");
+      if (navPlan) navPlan.textContent = planTitle;
+
+      const pathTitle = document.getElementById("planPathTitle");
+      if (pathTitle) pathTitle.textContent = label.split(" ")[0] + " path";
+
+      const buy = parseBuyMonth();
+      const prev = new Date(buy.getFullYear(), buy.getMonth() - 1, 1);
+      const prevName = MONTH_NAMES[prev.getMonth()];
+      const buyName = MONTH_NAMES[buy.getMonth()];
+
+      const timeline = document.getElementById("buyTimeline");
+      if (timeline) {
+        timeline.innerHTML = `
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div>
+              <h3>Now → mid ${prevName}</h3>
+              <p>Bank foreclosure letter for exact EV payoff date. Get 3 valuations (Tata exchange, CARS24, Spinny Jaipur).</p>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div>
+              <h3>Late ${prevName}</h3>
+              <p>Test Sierra Accomplished Diesel AT + one hybrid (Victoris / Hyryder) + Creta/Seltos if you want a second opinion.</p>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div>
+              <h3>Early ${buyName}</h3>
+              <p>Lock sealed on-road quote. Loan = on-road − (sale equity + your cash). Prefer putting max down to protect EMI.</p>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div>
+              <h3>Delivery week</h3>
+              <p>Clear EV loan same day as sale/exchange. Transfer RC. Activate insurance &amp; FASTag on new car.</p>
+            </div>
+          </div>`;
+      }
+
+      const active = document.querySelector("#nav button.active");
+      const panel = active?.dataset?.panel || "overview";
+      if (TITLES[panel]) {
+        document.getElementById("pageTitle").textContent = TITLES[panel][0];
+        document.getElementById("pageSub").textContent = TITLES[panel][1];
+      }
+    }
+
     const inr = (n) => "₹" + Math.round(Math.abs(n)).toLocaleString("en-IN");
 
     function getTenure() {
@@ -2124,7 +2204,7 @@
       const reviewMin = Number.isFinite(reviewMinRaw) ? Math.max(0, Math.min(5, reviewMinRaw)) : 0;
       const tenure = getTenure();
       const kmMonthRaw = +document.getElementById("kmMonth").value;
-      const cityShareRaw = +document.getElementById("cityShare").value;
+      const cityShareRaw = 70;
       const petrolRaw = +document.getElementById("petrolPrice").value;
       const dieselRaw = +document.getElementById("dieselPrice").value;
       const elecRaw = +document.getElementById("elecPrice").value;
@@ -2268,9 +2348,10 @@
       const lines = [
         "Jaipur SUV buying brief",
         "—".repeat(28),
+        `Planning to buy: ${buyMonthLabel(true)} (~15 ${buyMonthShort()})`,
         `EV Max sale ~ ${inr(sale)} · pending loan ${inr(pending)} · cash ${inr(cash)}`,
         `Down payment ${inr(down)} · rate ${rate}% · tenure ${tenure} mo · EMI target ${inr(target)}`,
-        `Usage ${usage.kmMonth} km/mo · ${usage.cityShare}% city`,
+        `Usage ${usage.kmMonth} km/mo`,
         "",
         pick
           ? `Lowest-EMI pick: ${pick.name} (${pick.variant}) — EMI ${inr(pick.monthly)} · score ${pick.score} · fuel/power ~ ${pick.runCost != null ? inr(pick.runCost) : "—"}/mo`
@@ -2297,13 +2378,6 @@
       document.getElementById("pageSub").textContent = TITLES[id][1];
     }
 
-    function daysToNovember() {
-      const now = new Date();
-      const target = new Date(now.getFullYear(), 10, 15);
-      if (now > target) target.setFullYear(target.getFullYear() + 1);
-      return Math.max(0, Math.ceil((target - now) / 86400000));
-    }
-
     function barRows(rows, maxEmi) {
       return rows
         .map((r) => {
@@ -2328,10 +2402,11 @@
       const brandsIn = new Set(list.map((c) => c.brand)).size;
 
       updateRailFoot(pending, cash, target);
+      syncBuyTiming();
 
       document.getElementById("statusBar").innerHTML = `
         <div><small>Market</small><strong>Jaipur</strong><em>On-road mid–high trim</em></div>
-        <div><small>Delivery window</small><strong>${daysToNovember()} days</strong><em>Target ~15 Nov</em></div>
+        <div><small>Delivery window</small><strong>${daysToBuy()} days</strong><em>Target ~15 ${buyMonthShort()}</em></div>
         <div><small>Shortlist</small><strong>${list.length} / ${CARS.length}</strong><em>${brandsIn} brands in view</em></div>
         <div><small>Under target</small><strong>${under}</strong><em>EMI ≤ ${inr(target)}</em></div>
         <div><small>Watchlist</small><strong>${watchIds.length} / 5</strong><em>Compare ${compareIds.length}/3</em></div>
@@ -2732,7 +2807,7 @@
     const PREFS_KEY = "suv-compare-prefs-v4";
     const NUMBER_IDS = [
       "sale", "pending", "cash", "rate", "targetEmi", "maxPrice", "ncapMin", "reviewMin",
-      "tenure", "kmMonth", "cityShare", "petrolPrice", "dieselPrice", "elecPrice",
+      "tenure", "kmMonth", "petrolPrice", "dieselPrice", "elecPrice",
     ];
     const MUST_IDS = [
       "emiFilter", "emiSoftFilter", "noLuxuryFilter", "midsizeFilter",
@@ -2804,7 +2879,6 @@
       const u = ctx.usage || {};
       const usageChanged = [
         u.kmMonth !== 1200,
-        u.cityShare !== 70,
         u.petrolPrice !== 102,
         u.dieselPrice !== 90,
         u.elecPrice !== 8,
@@ -2876,6 +2950,7 @@
         brand: document.getElementById("brandFilter").value,
         fuel: document.getElementById("fuelFilter").value,
         search: document.getElementById("garageSearch").value,
+        buyMonth: document.getElementById("buyMonth").value,
       };
       NUMBER_IDS.forEach((id) => {
         prefs.numbers[id] = document.getElementById(id).value;
@@ -2940,6 +3015,9 @@
       if (typeof prefs.search === "string") {
         document.getElementById("garageSearch").value = prefs.search;
       }
+      if (typeof prefs.buyMonth === "string" && /^\d{4}-\d{2}$/.test(prefs.buyMonth)) {
+        document.getElementById("buyMonth").value = prefs.buyMonth;
+      }
       if (prefs.sortMode && ["emi", "run", "score", "price", "delta", "ncap", "review", "brand"].includes(prefs.sortMode)) {
         sortMode = prefs.sortMode;
         document.querySelectorAll("#sortBtns button").forEach((b) => {
@@ -2984,6 +3062,8 @@
       document.getElementById(id).addEventListener("change", () => { persistAndRender(); });
     });
     document.getElementById("garageSearch").addEventListener("input", persistAndRender);
+    document.getElementById("buyMonth").addEventListener("change", persistAndRender);
+    document.getElementById("buyMonth").addEventListener("input", persistAndRender);
 
     document.getElementById("clearWatch").addEventListener("click", () => {
       watchIds = [];
