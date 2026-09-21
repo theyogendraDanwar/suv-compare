@@ -32,7 +32,17 @@
       background: var(--paper);
       color: var(--ink);
       min-height: 100vh;
+      min-height: 100dvh;
       line-height: 1.45;
+      overflow-x: hidden;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    .mobile-bar {
+      display: none;
+    }
+    .rail-scrim {
+      display: none;
     }
 
     .app {
@@ -899,7 +909,7 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
       gap: 14px;
     }
     .car {
@@ -1027,12 +1037,73 @@
     .rec-box .review-top strong { color: #f2f5ef; }
 
     .timeline { display: grid; gap: 0; }
+    .plan-meta {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .plan-meta > div {
+      background: var(--sand);
+      border: 1px solid var(--line);
+      padding: 12px;
+      min-width: 0;
+    }
+    .plan-meta small {
+      display: block;
+      font-size: 0.68rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .plan-meta strong {
+      display: block;
+      font-family: "Archivo Black", sans-serif;
+      font-size: 1.05rem;
+      letter-spacing: -0.02em;
+    }
+    .plan-meta em {
+      display: block;
+      font-style: normal;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
     .tl-item {
       display: grid;
       grid-template-columns: 28px 1fr;
       gap: 14px;
       padding-bottom: 22px;
     }
+    .tl-item.done .tl-dot { background: #8a9484; box-shadow: 0 0 0 4px #e4e0d6; }
+    .tl-item.done h3, .tl-item.done p { color: #8a9484; }
+    .tl-item.current .tl-dot {
+      background: var(--ember);
+      box-shadow: 0 0 0 4px #f0d9cc;
+    }
+    .tl-item.current h3 { color: var(--ember); }
+    .tl-phase {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-left: 8px;
+      color: var(--muted);
+    }
+    .tl-item.current .tl-phase { color: var(--ember); }
+    .tl-item.done .tl-phase { color: #8a9484; }
+    .tl-when {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--moss);
+      margin-bottom: 4px;
+    }
+    .tl-item.done .tl-when { color: #8a9484; }
+    .tl-item.current .tl-when { color: var(--ember); }
     .tl-dot {
       width: 14px;
       height: 14px;
@@ -1053,6 +1124,12 @@
     }
     .tl-item h3 { font-size: 1rem; margin-bottom: 4px; }
     .tl-item p { color: var(--muted); font-size: 0.92rem; }
+    @media (max-width: 900px) {
+      .plan-meta { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 520px) {
+      .plan-meta { grid-template-columns: 1fr; }
+    }
     .checklist { display: grid; gap: 8px; margin-top: 10px; }
     .checklist label {
       display: flex;
@@ -1084,7 +1161,8 @@
       font-weight: 700;
     }
 
-    @media (max-width: 1100px) {
+    /* Tablet: stack rail above content */
+    @media (max-width: 1100px) and (min-width: 901px) {
       .app { grid-template-columns: 1fr; }
       .rail {
         position: relative;
@@ -1092,7 +1170,195 @@
         max-height: none;
       }
       .kpi, .split, .grid { grid-template-columns: 1fr; }
-      .rec-meta { grid-template-columns: 1fr; }
+      .rec-meta { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* Phone: drawer rail + single-column main */
+    @media (max-width: 900px) {
+      .mobile-bar {
+        display: flex;
+        position: sticky;
+        top: 0;
+        z-index: 60;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 14px;
+        padding-top: max(12px, env(safe-area-inset-top));
+        background: var(--shell);
+        color: #e8ebe4;
+        border-bottom: 1px solid #2c382c;
+      }
+      .mobile-bar .mobile-brand {
+        font-family: "Archivo Black", sans-serif;
+        font-size: 1.25rem;
+        letter-spacing: -0.03em;
+        text-transform: uppercase;
+        line-height: 1.1;
+        min-width: 0;
+      }
+      .mobile-bar .mobile-brand span {
+        display: block;
+        font-family: "Figtree", sans-serif;
+        font-size: 0.68rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #9aa894;
+        margin-top: 4px;
+      }
+      .mobile-bar #railToggle {
+        flex-shrink: 0;
+        background: #243024;
+        border: 1px solid #3a4638;
+        color: #f0e6d4;
+        font: inherit;
+        font-size: 0.82rem;
+        font-weight: 700;
+        padding: 10px 14px;
+        min-height: 44px;
+        cursor: pointer;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .mobile-bar #railToggle[aria-expanded="true"] {
+        border-color: #c9a978;
+        color: #fff;
+      }
+
+      .rail-scrim {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 70;
+        background: rgba(18, 20, 15, 0.55);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+      }
+      body.rail-open .rail-scrim {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .app {
+        display: block;
+        min-height: 100dvh;
+      }
+      .rail {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: min(340px, 92vw);
+        z-index: 80;
+        height: 100dvh;
+        max-height: none;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-top: max(20px, env(safe-area-inset-top));
+        padding-bottom: max(24px, env(safe-area-inset-bottom));
+        transform: translateX(-105%);
+        transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+        box-shadow: none;
+      }
+      body.rail-open .rail {
+        transform: translateX(0);
+        box-shadow: 8px 0 32px rgba(0, 0, 0, 0.35);
+      }
+      body.rail-open { overflow: hidden; }
+      .rail .rail-brand { display: none; }
+
+      .main {
+        padding: 16px 14px max(40px, env(safe-area-inset-bottom));
+        min-width: 0;
+      }
+      .topbar {
+        align-items: flex-start;
+        margin-bottom: 16px;
+        padding-bottom: 14px;
+      }
+      .topbar h1 { font-size: 1.55rem; }
+      .topbar p { max-width: none; font-size: 0.9rem; }
+
+      .kpi,
+      .split,
+      .grid,
+      .status-bar,
+      .insight-grid,
+      .compare-grid,
+      .bucket-grid,
+      .avg-grid,
+      .rec-meta {
+        grid-template-columns: 1fr;
+      }
+      .status-bar { gap: 8px; }
+      .status-bar > div { padding: 10px 12px; }
+      .status-bar strong {
+        white-space: normal;
+        font-size: 0.98rem;
+      }
+
+      .stack-rows .row {
+        grid-template-columns: minmax(72px, 28vw) 1fr 64px;
+        gap: 8px;
+        font-size: 0.82rem;
+      }
+      .rail .seg { grid-template-columns: repeat(3, 1fr); }
+      .rail .price-chips { grid-template-columns: repeat(2, 1fr); }
+      .rail .chip span,
+      .rail .ghost-btn,
+      .nav button,
+      .card-actions button,
+      .sort-btns button,
+      .tools-actions button,
+      .quick-links button {
+        min-height: 44px;
+      }
+      .nav {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4px;
+      }
+      .nav button {
+        border-left: 0;
+        border-bottom: 3px solid transparent;
+        text-align: center;
+        padding: 12px 8px;
+      }
+      .nav button.active {
+        border-left-color: transparent;
+        border-bottom-color: #c9a978;
+      }
+
+      .rail select,
+      .rail input[type="number"],
+      .rail input[type="month"] {
+        font-size: 16px;
+        min-height: 44px;
+      }
+
+      .pill { font-size: 0.78rem; padding: 8px 10px; }
+      .car { padding: 14px; }
+      .car:hover { transform: none; }
+      .toast {
+        left: 12px;
+        right: 12px;
+        bottom: max(16px, env(safe-area-inset-bottom));
+        text-align: center;
+      }
+      .checklist label {
+        min-height: 44px;
+        align-items: center;
+      }
+      pre#briefPreview {
+        max-height: 220px;
+        font-size: 0.82rem !important;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .kpi b { font-size: 1.25rem; }
     }
 
     .seg-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
@@ -1222,8 +1488,16 @@
   </style>
 </head>
 <body>
+  <header class="mobile-bar" id="mobileBar">
+    <div class="mobile-brand">
+      Garage
+      <span id="mobileBrandSub">Jaipur · Nov move</span>
+    </div>
+    <button type="button" id="railToggle" aria-controls="rail" aria-expanded="false">Menu</button>
+  </header>
+  <div class="rail-scrim" id="railScrim"></div>
   <div class="app">
-    <aside class="rail">
+    <aside class="rail" id="rail">
       <div class="rail-brand">
         Garage
         <span id="railBrandSub">Jaipur · Nov move</span>
@@ -1546,18 +1820,20 @@
 
       <!-- PLAN -->
       <section class="panel" id="panel-plan">
+        <div class="plan-meta" id="planMeta"></div>
         <div class="split">
           <div class="panel-box">
-            <h2 id="planPathTitle">November path</h2>
+            <h2 id="planPathTitle">Buy path</h2>
             <div class="timeline" id="buyTimeline"></div>
           </div>
           <div class="panel-box">
             <h2>Dealer checklist</h2>
+            <p class="muted" id="planCheckHint" style="margin-bottom:8px">Ticks save on this device.</p>
             <div class="checklist" id="checklist">
               <label><input type="checkbox" data-k="v1" /> 3 EV Max sale quotes in writing</label>
               <label><input type="checkbox" data-k="v2" /> Foreclosure / NOC letter from bank</label>
-              <label><input type="checkbox" data-k="v3" /> Sierra Accomplished Diesel AT test drive</label>
-              <label><input type="checkbox" data-k="v4" /> Hybrid backup test drive</label>
+              <label><input type="checkbox" data-k="v3" /> <span id="checkTdLabel">Lead pick test drive</span></label>
+              <label><input type="checkbox" data-k="v4" /> Backup / hybrid test drive</label>
               <label><input type="checkbox" data-k="v5" /> Sealed Jaipur on-road quote</label>
               <label><input type="checkbox" data-k="v6" /> Loan sanction letter @ agreed rate</label>
               <label><input type="checkbox" data-k="v7" /> Confirm ventilated seats + rear blinds on VIN</label>
@@ -1968,67 +2244,142 @@
       return Math.max(0, Math.ceil((target - now) / 86400000));
     }
 
+    function fmtDay(d) {
+      return d.getDate() + " " + MONTH_SHORT[d.getMonth()] + " " + d.getFullYear();
+    }
+
+    function addDays(d, n) {
+      const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      x.setDate(x.getDate() + n);
+      return x;
+    }
+
+    function phaseStatus(now, start, end) {
+      if (now > end) return "done";
+      if (now >= start) return "current";
+      return "upcoming";
+    }
+
     function syncBuyTiming() {
       const label = buyMonthLabel(true);
       const short = buyMonthShort();
-      const planTitle = label.split(" ")[0] + " plan";
+      const planTitle = MONTH_NAMES[parseBuyMonth().getMonth()] + " plan";
 
       TITLES.overview[1] = `Your buying cockpit for a ${label} delivery in Jaipur.`;
       TITLES.plan[0] = planTitle;
-      TITLES.plan[1] = "Valuation → test drive → quote → delivery checklist.";
+      TITLES.plan[1] = `Target ~15 ${short} · valuation → test drive → quote → delivery.`;
 
       const railSub = document.getElementById("railBrandSub");
       if (railSub) railSub.textContent = `Jaipur · ${short} move`;
+      const mobileSub = document.getElementById("mobileBrandSub");
+      if (mobileSub) mobileSub.textContent = `Jaipur · ${short} move`;
 
       const navPlan = document.getElementById("navPlan");
       if (navPlan) navPlan.textContent = planTitle;
-
-      const pathTitle = document.getElementById("planPathTitle");
-      if (pathTitle) pathTitle.textContent = label.split(" ")[0] + " path";
-
-      const buy = parseBuyMonth();
-      const prev = new Date(buy.getFullYear(), buy.getMonth() - 1, 1);
-      const prevName = MONTH_NAMES[prev.getMonth()];
-      const buyName = MONTH_NAMES[buy.getMonth()];
-
-      const timeline = document.getElementById("buyTimeline");
-      if (timeline) {
-        timeline.innerHTML = `
-          <div class="tl-item">
-            <div class="tl-dot"></div>
-            <div>
-              <h3>Now → mid ${prevName}</h3>
-              <p>Bank foreclosure letter for exact EV payoff date. Get 3 valuations (Tata exchange, CARS24, Spinny Jaipur).</p>
-            </div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-dot"></div>
-            <div>
-              <h3>Late ${prevName}</h3>
-              <p>Test Sierra Accomplished Diesel AT + one hybrid (Victoris / Hyryder) + Creta/Seltos if you want a second opinion.</p>
-            </div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-dot"></div>
-            <div>
-              <h3>Early ${buyName}</h3>
-              <p>Lock sealed on-road quote. Loan = on-road − (sale equity + your cash). Prefer putting max down to protect EMI.</p>
-            </div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-dot"></div>
-            <div>
-              <h3>Delivery week</h3>
-              <p>Clear EV loan same day as sale/exchange. Transfer RC. Activate insurance &amp; FASTag on new car.</p>
-            </div>
-          </div>`;
-      }
 
       const active = document.querySelector("#nav button.active");
       const panel = active?.dataset?.panel || "overview";
       if (TITLES[panel]) {
         document.getElementById("pageTitle").textContent = TITLES[panel][0];
         document.getElementById("pageSub").textContent = TITLES[panel][1];
+      }
+    }
+
+    function renderPlanPanel(ctx) {
+      const { pick, sale, pending, cash, equity, down, target, rate } = ctx;
+      const buy = parseBuyMonth();
+      const buyName = MONTH_NAMES[buy.getMonth()];
+      const label = buyMonthLabel(true);
+      const days = daysToBuy();
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+
+      const pathTitle = document.getElementById("planPathTitle");
+      if (pathTitle) pathTitle.textContent = buyName + " path · " + buy.getFullYear();
+
+      const meta = document.getElementById("planMeta");
+      if (meta) {
+        meta.innerHTML = `
+          <div><small>Buy target</small><strong>${fmtDay(buy)}</strong><em>${label} delivery</em></div>
+          <div><small>Countdown</small><strong>${days} days</strong><em>${days === 0 ? "Delivery window" : "Until ~15 " + buyMonthShort()}</em></div>
+          <div><small>Down ready</small><strong>${inr(down)}</strong><em>Equity ${inr(equity)} + cash ${inr(cash)}</em></div>
+          <div><small>Lead pick</small><strong>${pick ? pick.short : "—"}</strong><em>${pick ? "EMI " + inr(pick.monthly) + " · target " + inr(target) : "Widen filters or set EMI target"}</em></div>
+        `;
+      }
+
+      // Four phases anchored to the buy date (~15th of selected month)
+      const p1Start = addDays(buy, -45);
+      const p1End = addDays(buy, -30);
+      const p2Start = addDays(buy, -29);
+      const p2End = addDays(buy, -15);
+      const p3Start = addDays(buy, -14);
+      const p3End = addDays(buy, -4);
+      const p4Start = addDays(buy, -3);
+      const p4End = addDays(buy, 7);
+
+      const pickLine = pick
+        ? `Prioritise ${pick.name} (${pick.variant}) — EMI ~ ${inr(pick.monthly)} vs target ${inr(target)}.`
+        : "Shortlist is empty under current filters — loosen EMI / features, then lock a lead + backup.";
+
+      const phases = [
+        {
+          title: "Valuations & foreclosure",
+          start: p1Start,
+          end: p1End,
+          body: `Bank foreclosure letter for exact EV Max payoff (pending ~ ${inr(pending)}). Get 3 sale quotes (Tata exchange, CARS24, Spinny Jaipur) aiming near ${inr(sale)}.`,
+        },
+        {
+          title: "Test drives",
+          start: p2Start,
+          end: p2End,
+          body: pickLine + " Also drive one hybrid backup (Victoris / Hyryder / Creta) for a second opinion.",
+        },
+        {
+          title: "Lock quote & loan",
+          start: p3Start,
+          end: p3End,
+          body: `Sealed Jaipur on-road quote. Loan ≈ on-road − ${inr(down)} down (equity ${inr(equity)} + cash ${inr(cash)}). Push rate toward ${rate}% and keep EMI ≤ ${inr(target)}.`,
+        },
+        {
+          title: "Delivery week",
+          start: p4Start,
+          end: p4End,
+          body: "Clear EV loan same day as sale/exchange. Transfer RC. Activate insurance & FASTag on the new car. Confirm ventilated seats + rear blinds on the VIN.",
+        },
+      ];
+
+      const statusLabel = { done: "Done", current: "Now", upcoming: "Next" };
+      const statuses = phases.map((ph) => phaseStatus(now, ph.start, ph.end));
+      if (!statuses.includes("current")) {
+        const nextIdx = statuses.indexOf("upcoming");
+        if (nextIdx >= 0) statuses[nextIdx] = "current";
+      }
+
+      const timeline = document.getElementById("buyTimeline");
+      if (timeline) {
+        timeline.innerHTML = phases.map((ph, i) => {
+          const st = statuses[i];
+          return `<div class="tl-item ${st}">
+            <div class="tl-dot"></div>
+            <div>
+              <span class="tl-when">${fmtDay(ph.start)} → ${fmtDay(ph.end)}</span>
+              <h3>${ph.title}<span class="tl-phase">${statusLabel[st]}</span></h3>
+              <p>${ph.body}</p>
+            </div>
+          </div>`;
+        }).join("");
+      }
+
+      const hint = document.getElementById("planCheckHint");
+      if (hint) {
+        hint.textContent = pick
+          ? `Lead pick: ${pick.short}. Checklist ticks save on this device.`
+          : "Ticks save on this device. Set filters to surface a lead pick.";
+      }
+
+      const tdLabel = document.getElementById("checkTdLabel");
+      if (tdLabel) {
+        tdLabel.textContent = pick ? `${pick.short} test drive` : "Lead pick test drive";
       }
     }
 
@@ -2372,6 +2723,24 @@
       document.getElementById("panel-" + id).classList.add("active");
       document.getElementById("pageTitle").textContent = TITLES[id][0];
       document.getElementById("pageSub").textContent = TITLES[id][1];
+      closeRail();
+    }
+
+    function openRail() {
+      document.body.classList.add("rail-open");
+      const toggle = document.getElementById("railToggle");
+      if (toggle) toggle.setAttribute("aria-expanded", "true");
+    }
+
+    function closeRail() {
+      document.body.classList.remove("rail-open");
+      const toggle = document.getElementById("railToggle");
+      if (toggle) toggle.setAttribute("aria-expanded", "false");
+    }
+
+    function toggleRail() {
+      if (document.body.classList.contains("rail-open")) closeRail();
+      else openRail();
     }
 
     function barRows(rows, maxEmi) {
@@ -2399,6 +2768,7 @@
 
       updateRailFoot(pending, cash, target);
       syncBuyTiming();
+      renderPlanPanel(ctx);
 
       document.getElementById("statusBar").innerHTML = `
         <div><small>Market</small><strong>Jaipur</strong><em>On-road mid–high trim</em></div>
@@ -2783,6 +3153,15 @@
     // Nav
     document.querySelectorAll("#nav button").forEach((btn) => {
       btn.addEventListener("click", () => goPanel(btn.dataset.panel));
+    });
+
+    document.getElementById("railToggle")?.addEventListener("click", toggleRail);
+    document.getElementById("railScrim")?.addEventListener("click", closeRail);
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeRail();
+    });
+    window.addEventListener("resize", () => {
+      if (window.matchMedia("(min-width: 901px)").matches) closeRail();
     });
 
     document.getElementById("clearCompare").addEventListener("click", () => {
