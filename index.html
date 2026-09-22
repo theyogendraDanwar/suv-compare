@@ -1977,7 +1977,7 @@
   <header class="mobile-bar" id="mobileBar">
     <div class="mobile-brand">
       Garage
-      <span id="mobileBrandSub">Jaipur · Nov move</span>
+      <span id="mobileBrandSub">Jaipur · Nov · GGN</span>
     </div>
     <button type="button" id="railToggle" aria-controls="rail" aria-expanded="false">Filters</button>
   </header>
@@ -1986,7 +1986,7 @@
     <aside class="rail" id="rail">
       <div class="rail-brand">
         Garage
-        <span id="railBrandSub">Jaipur · Nov move</span>
+        <span id="railBrandSub">Jaipur · Nov · GGN commute</span>
       </div>
 
       <nav class="nav" id="nav">
@@ -2094,6 +2094,11 @@
         <details class="filter-acc" open data-acc="usage">
           <summary>Usage (running cost) <em class="acc-count" data-acc-count="usage">0</em></summary>
           <div class="acc-body">
+            <label>
+              Weekly commute one-way (km)
+              <input type="number" id="commuteOneWay" min="50" max="800" step="5" value="285" />
+            </label>
+            <p class="field-hint" id="commuteHint">Jaipur → Gurugram · round-trip each week</p>
             <label>
               Petrol ₹/L
               <input type="number" id="petrolPrice" min="50" max="200" step="1" value="102" />
@@ -2309,7 +2314,7 @@
             </div>
             <div class="overview-card panel-box">
               <h2>Monthly run cost</h2>
-              <p class="muted" style="margin-bottom:12px">EMI + estimated fuel/power from your km mix.</p>
+              <p class="muted" style="margin-bottom:12px" id="runCostHint">EMI + fuel/power for Jaipur ↔ Gurugram weekly commute.</p>
               <div class="stack-rows" id="runBars"></div>
             </div>
             <div class="overview-card panel-box">
@@ -2732,14 +2737,15 @@
       const market = getMarket();
       syncMarketUI();
 
-      TITLES.overview[1] = `Your buying cockpit for a ${label} delivery in ${market.name}.`;
+      TITLES.overview[1] = `Your buying cockpit for a ${label} delivery in ${market.name} — weekly Jaipur ↔ Gurugram commute.`;
       TITLES.plan[0] = planTitle;
       TITLES.plan[1] = `Target ~15 ${short} · valuation → test drive → quote → delivery.`;
+      TITLES.decide[1] = `Scores and run cost for ~${getCommuteUsage().kmMonth.toLocaleString("en-IN")} km/mo on the Jaipur ↔ Gurugram run.`;
 
       const railSub = document.getElementById("railBrandSub");
-      if (railSub) railSub.textContent = `${market.name} · ${short} move`;
+      if (railSub) railSub.textContent = `${market.name} · ${short} · GGN commute`;
       const mobileSub = document.getElementById("mobileBrandSub");
-      if (mobileSub) mobileSub.textContent = `${market.name} · ${short} move`;
+      if (mobileSub) mobileSub.textContent = `${market.name} · ${short} · GGN`;
 
       const navPlan = document.getElementById("navPlan");
       if (navPlan) navPlan.textContent = planTitle;
@@ -2871,6 +2877,25 @@
       if (f.includes("hybrid")) return "Hybrid";
       if (f.includes("diesel")) return "Diesel";
       return "Petrol";
+    }
+
+    function getCommuteUsage() {
+      const oneWayRaw = +document.getElementById("commuteOneWay")?.value;
+      const oneWay = Number.isFinite(oneWayRaw) && oneWayRaw > 0 ? oneWayRaw : 285;
+      // 1 round-trip / week on Jaipur ↔ Gurugram (mostly NH48 highway)
+      const weeksPerMonth = 52 / 12;
+      const kmMonth = Math.round(oneWay * 2 * weeksPerMonth);
+      const cityShare = 18; // city ends in Jaipur + Gurugram; rest highway
+      return { oneWay, kmMonth, cityShare, route: "Jaipur ↔ Gurugram" };
+    }
+
+    function syncCommuteUI() {
+      const c = getCommuteUsage();
+      const hint = document.getElementById("commuteHint");
+      if (hint) {
+        hint.textContent =
+          `${c.route} · ~${c.kmMonth.toLocaleString("en-IN")} km/mo · ~${100 - c.cityShare}% highway`;
+      }
     }
 
     function runCostMonthly(c, usage) {
@@ -3019,14 +3044,16 @@
       const reviewMinRaw = +document.getElementById("reviewMin").value;
       const reviewMin = Number.isFinite(reviewMinRaw) ? Math.max(0, Math.min(5, reviewMinRaw)) : 0;
       const tenure = getTenure();
-      const kmMonthRaw = 1200;
-      const cityShareRaw = 70;
+      const commute = getCommuteUsage();
+      syncCommuteUI();
       const petrolRaw = +document.getElementById("petrolPrice").value;
       const dieselRaw = +document.getElementById("dieselPrice").value;
       const elecRaw = +document.getElementById("elecPrice").value;
       const usage = {
-        kmMonth: Number.isFinite(kmMonthRaw) && kmMonthRaw > 0 ? kmMonthRaw : 1200,
-        cityShare: Number.isFinite(cityShareRaw) ? Math.max(0, Math.min(100, cityShareRaw)) : 70,
+        oneWay: commute.oneWay,
+        route: commute.route,
+        kmMonth: commute.kmMonth,
+        cityShare: commute.cityShare,
         petrolPrice: Number.isFinite(petrolRaw) && petrolRaw > 0 ? petrolRaw : 102,
         dieselPrice: Number.isFinite(dieselRaw) && dieselRaw > 0 ? dieselRaw : 90,
         elecPrice: Number.isFinite(elecRaw) && elecRaw > 0 ? elecRaw : 8,
@@ -3175,6 +3202,7 @@
         `EV Max sale ~ ${inr(sale)} · pending loan ${inr(pending)} · cash ${inr(cash)}`,
         `Down payment ${inr(down)} · rate ${rate}% · tenure ${tenure} mo · EMI target ${inr(target)}`,
         `Fuel prices: petrol ₹${usage.petrolPrice}/L · diesel ₹${usage.dieselPrice}/L · power ₹${usage.elecPrice}/kWh`,
+        `Commute: ${usage.route} · ${usage.oneWay} km one-way weekly (~${usage.kmMonth.toLocaleString("en-IN")} km/mo · ~${100 - usage.cityShare}% highway)`,
         "",
         pick
           ? `Lowest-EMI pick: ${pick.name} (${pick.variant}) — EMI ${inr(pick.monthly)} · score ${pick.score} · fuel/power ~ ${pick.runCost != null ? inr(pick.runCost) : "—"}/mo`
@@ -3255,6 +3283,7 @@
 
       document.getElementById("statusBar").innerHTML = `
         <div><small>Market</small><strong>${getMarket().name}</strong><em>On-road ×${getMarket().factor.toFixed(2)} vs Jaipur</em></div>
+        <div><small>Commute</small><strong>${usage.oneWay} km</strong><em>${usage.route} weekly · ~${usage.kmMonth.toLocaleString("en-IN")} km/mo</em></div>
         <div><small>Delivery window</small><strong>${daysToBuy()} days</strong><em>Target ~15 ${buyMonthShort()}</em></div>
         <div><small>Shortlist</small><strong>${list.length} / ${CARS.length}</strong><em>${brandsIn} brands in view</em></div>
         <div><small>Under target</small><strong>${under}</strong><em>EMI ≤ ${inr(target)}</em></div>
@@ -3593,6 +3622,11 @@
 
       const byRun = [...list].sort((a, b) => (a.totalMonthly || 0) - (b.totalMonthly || 0)).slice(0, 10);
       const maxRunTotal = Math.max(...byRun.map((c) => c.totalMonthly || 0), 1);
+      const runHint = document.getElementById("runCostHint");
+      if (runHint) {
+        runHint.textContent =
+          `EMI + fuel/power · ${usage.route} ${usage.oneWay} km one-way weekly (~${usage.kmMonth.toLocaleString("en-IN")} km/mo, ~${100 - usage.cityShare}% highway).`;
+      }
       document.getElementById("runBars").innerHTML = byRun.length
         ? byRun.map((r) => {
             const pct = Math.max(4, Math.round(((r.totalMonthly || 0) / maxRunTotal) * 100));
@@ -3731,7 +3765,7 @@
     const PREFS_KEY = "suv-compare-prefs-v4";
     const NUMBER_IDS = [
       "sale", "pending", "cash", "rate", "targetEmi", "maxPrice", "ncapMin", "reviewMin",
-      "tenure", "petrolPrice", "dieselPrice", "elecPrice",
+      "tenure", "commuteOneWay", "petrolPrice", "dieselPrice", "elecPrice",
     ];
     const MUST_IDS = [
       "emiFilter", "emiSoftFilter", "noLuxuryFilter", "midsizeFilter",
@@ -3802,6 +3836,7 @@
 
       const u = ctx.usage || {};
       const usageChanged = [
+        u.oneWay != null && u.oneWay !== 285,
         u.petrolPrice !== 102,
         u.dieselPrice !== 90,
         u.elecPrice !== 8,
