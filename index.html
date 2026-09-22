@@ -2099,6 +2099,10 @@
               <input type="number" id="commuteOneWay" min="50" max="800" step="5" value="285" />
             </label>
             <p class="field-hint" id="commuteHint">Jaipur → Gurugram · round-trip each week</p>
+            <div class="chip-grid" style="margin-bottom:12px">
+              <label class="chip"><input type="checkbox" id="commuteFilter" checked /><span>Commute-ready only</span></label>
+            </div>
+            <p class="field-hint" id="commuteFilterHint">Keeps cars fit for the weekly highway run</p>
             <label>
               Petrol ₹/L
               <input type="number" id="petrolPrice" min="50" max="200" step="1" value="102" />
@@ -2896,6 +2900,23 @@
         hint.textContent =
           `${c.route} · ~${c.kmMonth.toLocaleString("en-IN")} km/mo · ~${100 - c.cityShare}% highway`;
       }
+      const fHint = document.getElementById("commuteFilterHint");
+      if (fHint) {
+        const need = Math.ceil(c.oneWay * 1.2);
+        fHint.textContent =
+          `Filter: no micros · ICE hwy ≥12 kmpl · EV hwy range ≥${need} km (one-way +20%)`;
+      }
+    }
+
+    /** Fit for weekly Jaipur↔Gurugram: drop micros; EV must cover one-way; ICE needs usable hwy kmpl. */
+    function isCommuteReady(c, oneWay) {
+      if (MICRO_IDS.has(c.id)) return false;
+      if (c.hwyAvg == null || !Number.isFinite(c.hwyAvg)) return false;
+      if (c.effUnit === "km") {
+        const need = Math.ceil((oneWay > 0 ? oneWay : 285) * 1.2);
+        return c.hwyAvg >= need;
+      }
+      return c.hwyAvg >= 12;
     }
 
     function runCostMonthly(c, usage) {
@@ -2983,6 +3004,7 @@
         ctx.emiOnly && ("EMI ≤ " + inr(ctx.target)),
         ctx.emiSoft && "EMI ≤ +15%",
         ctx.maxPrice > 0 && ("max " + inr(ctx.maxPrice)),
+        ctx.commuteOnly && ("commute-ready · " + (ctx.usage?.oneWay || 285) + " km"),
         ctx.noLuxury && "no luxury",
         ctx.midsizeOnly && "midsize+",
         ctx.autoOnly && "automatic",
@@ -3046,6 +3068,7 @@
       const tenure = getTenure();
       const commute = getCommuteUsage();
       syncCommuteUI();
+      const commuteOnly = document.getElementById("commuteFilter").checked;
       const petrolRaw = +document.getElementById("petrolPrice").value;
       const dieselRaw = +document.getElementById("dieselPrice").value;
       const elecRaw = +document.getElementById("elecPrice").value;
@@ -3086,6 +3109,7 @@
       if (brand !== "all") list = list.filter((c) => c.brand === brand);
       if (fuel !== "all") list = list.filter((c) => c.bucket === fuel);
       if (maxPrice > 0) list = list.filter((c) => c.price <= maxPrice);
+      if (commuteOnly) list = list.filter((c) => isCommuteReady(c, usage.oneWay));
       if (emiOnly) list = list.filter((c) => c.monthly <= target);
       if (emiSoft) list = list.filter((c) => c.monthly <= target * 1.15);
       if (noLuxury) list = list.filter((c) => !c.isLuxury);
@@ -3141,6 +3165,7 @@
         list, pick, sale, rate, pending, cash, equity, down, brand, fuel, target, q, maxPrice,
         ventOnly, carplayOnly, blindOnly, powerSeatOnly, emiOnly, emiSoft, noLuxury, midsizeOnly,
         autoOnly, sevenOnly, sunroofOnly, adasOnly, ncapMin, reviewMin, tenure, usage,
+        commuteOnly,
       };
     }
 
@@ -3420,6 +3445,7 @@
         ctx.emiOnly && ("EMI ≤ " + inr(target)),
         ctx.emiSoft && "EMI ≤ +15%",
         ctx.maxPrice > 0 && ("max " + inr(ctx.maxPrice)),
+        ctx.commuteOnly && ("commute-ready · " + usage.oneWay + " km"),
         ctx.noLuxury && "no luxury",
         ctx.midsizeOnly && "midsize+",
         ctx.autoOnly && "automatic",
@@ -3768,7 +3794,7 @@
       "tenure", "commuteOneWay", "petrolPrice", "dieselPrice", "elecPrice",
     ];
     const MUST_IDS = [
-      "emiFilter", "emiSoftFilter", "noLuxuryFilter", "midsizeFilter",
+      "emiFilter", "emiSoftFilter", "noLuxuryFilter", "midsizeFilter", "commuteFilter",
       "autoFilter", "sevenFilter",
       "ventFilter", "carplayFilter", "blindFilter", "powerSeatFilter", "sunroofFilter",
       "adasFilter",
@@ -3836,6 +3862,7 @@
 
       const u = ctx.usage || {};
       const usageChanged = [
+        ctx.commuteOnly,
         u.oneWay != null && u.oneWay !== 285,
         u.petrolPrice !== 102,
         u.dieselPrice !== 90,
@@ -3870,6 +3897,7 @@
         { show: ctx.noLuxury, label: "No luxury", clear: () => { document.getElementById("noLuxuryFilter").checked = false; } },
         { show: ctx.midsizeOnly, label: "Midsize+", clear: () => { document.getElementById("midsizeFilter").checked = false; } },
         { show: ctx.maxPrice > 0, label: "Max " + inr(ctx.maxPrice), clear: () => { document.getElementById("maxPrice").value = "0"; syncPriceChips(); } },
+        { show: ctx.commuteOnly, label: "Commute-ready", clear: () => { document.getElementById("commuteFilter").checked = false; } },
         { show: ctx.fuel !== "all", label: ctx.fuel, clear: () => { document.getElementById("fuelFilter").value = "all"; syncFuelSeg(); } },
         { show: ctx.autoOnly, label: "Automatic", clear: () => { document.getElementById("autoFilter").checked = false; } },
         { show: ctx.sevenOnly, label: "6/7 seater", clear: () => { document.getElementById("sevenFilter").checked = false; } },
