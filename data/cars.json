@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-21T18:25:51Z",
+  "updatedAt": "2026-09-26T08:56:50Z",
   "source": "carwale+curated",
   "cars": [
     {
@@ -1681,6 +1681,24 @@
       "bodyStyleId": 6
     },
     {
+      "id": "thar-og",
+      "brand": "Mahindra",
+      "short": "Thar OG",
+      "name": "Mahindra Thar OG",
+      "variant": "Mid–high trim · confirm dealer",
+      "price": 1032000,
+      "fuel": "Petrol",
+      "mileage": "— kmpl",
+      "note": "Auto-imported from CarWale — confirm Jaipur on-road & features.",
+      "ventilated": false,
+      "wirelessCarplay": true,
+      "rearBlinds": false,
+      "powerSeat": false,
+      "source": "carwale",
+      "sourceModelId": 3690,
+      "bodyStyleId": 6
+    },
+    {
       "id": "thar-roxx",
       "brand": "Mahindra",
       "short": "Thar ROXX",
@@ -2177,7 +2195,7 @@
       "short": "GLS",
       "name": "Mercedes-Benz GLS",
       "variant": "Mid–high trim · confirm dealer",
-      "price": 12800000,
+      "price": 13800000,
       "fuel": "Petrol",
       "mileage": "— kmpl",
       "note": "Auto-imported from CarWale — confirm Jaipur on-road & features.",
