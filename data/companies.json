@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-01T10:35:20Z",
+  "updatedAt": "2026-10-06T10:55:42Z",
   "source": "carwale+curated",
   "companies": [
     {
@@ -30,6 +30,11 @@
     {
       "name": "Citroen",
       "slug": "citroen-cars",
+      "source": "carwale"
+    },
+    {
+      "name": "Denza",
+      "slug": "denza-cars",
       "source": "carwale"
     },
     {
