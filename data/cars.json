@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-06T10:55:42Z",
+  "updatedAt": "2026-10-11T10:27:27Z",
   "source": "carwale+curated",
   "cars": [
     {
@@ -596,7 +596,7 @@
       "wirelessCarplay": true,
       "rearBlinds": false,
       "powerSeat": true,
-      "sourceModelId": 2349,
+      "sourceModelId": 3780,
       "bodyStyleId": 6
     },
     {
@@ -1091,7 +1091,7 @@
       "short": "Urus SE",
       "name": "Lamborghini Urus SE",
       "variant": "Mid–high trim · confirm dealer",
-      "price": 44700000,
+      "price": 1500000,
       "fuel": "Petrol",
       "mileage": "— kmpl",
       "note": "Auto-imported from CarWale — confirm Jaipur on-road & features.",
@@ -1598,7 +1598,7 @@
       "short": "Bolero Neo Plus",
       "name": "Mahindra Bolero Neo Plus",
       "variant": "Mid–high trim · confirm dealer",
-      "price": 1139000,
+      "price": 1146000,
       "fuel": "Petrol",
       "mileage": "— kmpl",
       "note": "Auto-imported from CarWale — confirm Jaipur on-road & features.",
@@ -1634,7 +1634,7 @@
       "short": "Scorpio",
       "name": "Mahindra Scorpio",
       "variant": "Mid–high trim · confirm dealer",
-      "price": 1337000,
+      "price": 1343000,
       "fuel": "Petrol",
       "mileage": "— kmpl",
       "note": "Auto-imported from CarWale — confirm Jaipur on-road & features.",
@@ -2383,6 +2383,24 @@
       "powerSeat": false,
       "source": "carwale",
       "sourceModelId": 1603,
+      "bodyStyleId": 6
+    },
+    {
+      "id": "macan-electric",
+      "brand": "Porsche",
+      "short": "Macan Electric",
+      "name": "Porsche Macan Electric",
+      "variant": "Mid–high trim · confirm dealer",
+      "price": 12200000,
+      "fuel": "Petrol",
+      "mileage": "— kmpl",
+      "note": "Auto-imported from CarWale — confirm Jaipur on-road & features.",
+      "ventilated": false,
+      "wirelessCarplay": true,
+      "rearBlinds": false,
+      "powerSeat": false,
+      "source": "carwale",
+      "sourceModelId": 2741,
       "bodyStyleId": 6
     },
     {
