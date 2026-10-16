@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-11T10:27:27Z",
+  "updatedAt": "2026-10-16T08:37:35Z",
   "source": "carwale+curated",
   "cars": [
     {
@@ -1091,7 +1091,7 @@
       "short": "Urus SE",
       "name": "Lamborghini Urus SE",
       "variant": "Mid–high trim · confirm dealer",
-      "price": 1500000,
+      "price": 44700000,
       "fuel": "Petrol",
       "mileage": "— kmpl",
       "note": "Auto-imported from CarWale — confirm Jaipur on-road & features.",
@@ -3113,6 +3113,24 @@
       "rearBlinds": false,
       "powerSeat": true,
       "sourceModelId": 2799,
+      "bodyStyleId": 6
+    },
+    {
+      "id": "ex90",
+      "brand": "Volvo",
+      "short": "EX90",
+      "name": "Volvo EX90",
+      "variant": "Mid–high trim · confirm dealer",
+      "price": 12600000,
+      "fuel": "Petrol",
+      "mileage": "— kmpl",
+      "note": "Auto-imported from CarWale — confirm Jaipur on-road & features.",
+      "ventilated": false,
+      "wirelessCarplay": true,
+      "rearBlinds": false,
+      "powerSeat": false,
+      "source": "carwale",
+      "sourceModelId": 2791,
       "bodyStyleId": 6
     },
     {
