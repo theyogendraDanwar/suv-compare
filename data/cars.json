@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-16T08:37:35Z",
+  "updatedAt": "2026-10-21T09:00:00Z",
   "source": "carwale+curated",
   "cars": [
     {
@@ -34,7 +34,7 @@
       "wirelessCarplay": true,
       "rearBlinds": true,
       "powerSeat": true,
-      "sourceModelId": 1113,
+      "sourceModelId": 3752,
       "bodyStyleId": 6
     },
     {
