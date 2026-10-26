@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-21T09:00:00Z",
+  "updatedAt": "2026-10-26T09:31:07Z",
   "source": "carwale+curated",
   "cars": [
     {
@@ -632,6 +632,24 @@
       "rearBlinds": true,
       "powerSeat": true,
       "sourceModelId": 2609,
+      "bodyStyleId": 6
+    },
+    {
+      "id": "bayon",
+      "brand": "Hyundai",
+      "short": "Bayon",
+      "name": "Hyundai Bayon",
+      "variant": "Mid–high trim · confirm dealer",
+      "price": 1000000,
+      "fuel": "Petrol",
+      "mileage": "— kmpl",
+      "note": "Auto-imported from CarWale — confirm Jaipur on-road & features.",
+      "ventilated": false,
+      "wirelessCarplay": true,
+      "rearBlinds": false,
+      "powerSeat": false,
+      "source": "carwale",
+      "sourceModelId": 3623,
       "bodyStyleId": 6
     },
     {
