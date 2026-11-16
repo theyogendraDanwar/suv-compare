@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-11T11:36:18Z",
+  "updatedAt": "2026-11-16T12:17:50Z",
   "source": "carwale+curated",
   "cars": [
     {
@@ -528,6 +528,24 @@
       "source": "carwale",
       "sourceModelId": 2017,
       "bodyStyleId": 6
+    },
+    {
+      "id": "d9",
+      "brand": "Denza",
+      "short": "D9",
+      "name": "Denza D9",
+      "variant": "Mid–high trim · confirm dealer",
+      "price": 9000000,
+      "fuel": "Petrol",
+      "mileage": "— kmpl",
+      "note": "Auto-imported from CarWale — confirm Jaipur on-road & features.",
+      "ventilated": false,
+      "wirelessCarplay": true,
+      "rearBlinds": false,
+      "powerSeat": false,
+      "source": "carwale",
+      "sourceModelId": 4068,
+      "bodyStyleId": 9
     },
     {
       "id": "purosangue-suv",
