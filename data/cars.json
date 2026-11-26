@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-21T11:55:08Z",
+  "updatedAt": "2026-11-26T13:22:56Z",
   "source": "carwale+curated",
   "cars": [
     {
@@ -1879,7 +1879,7 @@
       "short": "Ertiga",
       "name": "Maruti Ertiga",
       "variant": "Mid–high trim · confirm dealer",
-      "price": 890000,
+      "price": 895000,
       "fuel": "Petrol",
       "mileage": "— kmpl",
       "note": "Auto-imported from CarWale — confirm Jaipur on-road & features.",
@@ -2929,7 +2929,7 @@
       "short": "Innova Hycross",
       "name": "Toyota Innova Hycross",
       "variant": "Mid–high trim · confirm dealer",
-      "price": 1953000,
+      "price": 1959000,
       "fuel": "Petrol",
       "mileage": "— kmpl",
       "note": "Auto-imported from CarWale — confirm Jaipur on-road & features.",
@@ -2938,7 +2938,7 @@
       "rearBlinds": false,
       "powerSeat": false,
       "source": "carwale",
-      "sourceModelId": 1821,
+      "sourceModelId": 3920,
       "bodyStyleId": 9
     },
     {
